@@ -8,12 +8,12 @@ import {
 
 const router = Router();
 
-router.get('/email/:token', (req, res) => verifyEmailController.handle(req, res));
+router.get('/email/:token', verifyEmailController.handle.bind(resendEmailVerificationController));
 
-router.post('/email/resend', (req, res) => resendEmailVerificationController.handle(req, res));
+router.post('/email/resend', resendEmailVerificationController.handle.bind(resendEmailVerificationController));
 
-router.post('/phone', (req, res) => verifyPhoneController.handle(req, res));
+router.post('/phone', verifyPhoneController.handle.bind(verifyPhoneController));
 
-router.post('/phone/resend', (req, res) => resendPhoneVerificationController.handle(req, res));
+router.post('/phone/resend', resendPhoneVerificationController.handle.bind(resendPhoneVerificationController));
 
 export default router;

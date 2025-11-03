@@ -1,6 +1,6 @@
 import app from './app';
-import { initializeDatabase, closeDatabase } from './src/config/data-source';
-import { eventPublisher } from './src/infrastructure/api/dependencies/dependencies';
+import { initializeDatabase, closeDatabase } from './config/data-source';
+import { eventPublisher } from './infrastructure/api/dependencies/dependencies';
 
 const PORT = process.env.PORT;
 
@@ -16,11 +16,7 @@ const startServer = async () => {
     console.log('Intentando conectar con URL:', process.env.RABBITMQ_URL);
     console.log('----------------------------');
     await eventPublisher.connect();
-    console.log('✅ RabbitMQ connected successfully');
-    console.log('--- DEBUGGING RABBITMQ ---');
-    console.log('Intentando conectar con URL:', process.env.RABBITMQ_URL);
-    console.log('----------------------------');
-
+    
     app.listen((PORT), () => {
       console.log(`Server running in port: http://localhost:${PORT}`);
     });

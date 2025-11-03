@@ -1,4 +1,4 @@
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AppDataSource } from '../../config/data-source';
 import { PermissionSchema } from '../../database/schemas/permission.schema';
 import { RoleSchema } from '../../database/schemas/role.schema';

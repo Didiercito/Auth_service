@@ -1,6 +1,5 @@
 import { IPermissionRepository } from '../../domain/interfaces/permission.repository.interface';
 import { GetUserPermissionsDto } from '../dtos/get-user-permissions.dto';
-import { Permission } from '../../domain/entities/permission.entity';
 
 export interface UserPermissionsResponse {
   userId: number;
