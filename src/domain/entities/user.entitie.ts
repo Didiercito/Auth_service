@@ -10,6 +10,14 @@ import {
   Min,
   Max
 } from 'class-validator';
+import { Role } from './role.entity';
+import { UserSkill } from './user-skill.entity';
+import { UserAvailability } from './user-availability.entity';
+import { UserSchedule } from './user-schedule.entity';
+import { UserReputationHistory } from './user-reputation-history.entity';
+import { EmailVerification } from './email-verification.entity';
+import { PhoneVerification } from './phone-verification.entity';
+import { PasswordResetToken } from './password-reset-token.entity';
 
 export enum UserStatus {
   ACTIVE = 'active',
@@ -24,6 +32,13 @@ export class User {
   id: number;
 
   @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  passwordHash: string;
+
+  @IsNotEmpty()
   @Length(2, 255)
   names: string;
 
@@ -35,36 +50,12 @@ export class User {
   @Length(2, 255)
   secondLastName: string;
 
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  passwordHash: string;
-
   @IsOptional()
   imageProfile?: string | null;
 
   @IsOptional()
   @Length(10, 50)
   phoneNumber?: string | null;
-
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  reputationScore: number;
-
-  @IsOptional()
-  googleUserId?: string | null;
-
-  @IsEnum(UserStatus)
-  status: UserStatus;
-
-  @IsBoolean()
-  verifiedEmail: boolean;
-
-  @IsBoolean()
-  verifiedPhone: boolean;
 
   @IsOptional()
   @IsNumber()
@@ -73,6 +64,31 @@ export class User {
   @IsOptional()
   @IsNumber()
   municipalityId?: number | null;
+
+  @IsBoolean()
+  verifiedEmail: boolean;
+
+  @IsBoolean()
+  verifiedPhone: boolean;
+
+  @IsOptional()
+  @IsDate()
+  emailVerifiedAt?: Date | null;
+
+  @IsOptional()
+  @IsDate()
+  phoneVerifiedAt?: Date | null;
+
+  @IsEnum(UserStatus)
+  status: UserStatus;
+
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  reputationScore: number;
+
+  @IsOptional()
+  googleUserId?: string | null;
 
   @IsDate()
   createdAt: Date;
@@ -84,6 +100,20 @@ export class User {
   @IsNumber()
   createdBy?: number | null;
 
+  roles?: Role[];
+
+  userSkills?: UserSkill[];
+
+  availability?: UserAvailability[];
+  schedules?: UserSchedule[];
+
+  reputationHistory?: UserReputationHistory[];
+
+  emailVerifications?: EmailVerification[];
+  phoneVerifications?: PhoneVerification[];
+
+  passwordResetTokens?: PasswordResetToken[];
+
   constructor(
     id: number,
     names: string,
@@ -91,18 +121,20 @@ export class User {
     secondLastName: string,
     email: string,
     passwordHash: string,
-    imageProfile: string | null,
-    phoneNumber: string | null,
-    reputationScore: number,
-    googleUserId: string | null,
-    status: UserStatus,
-    verifiedEmail: boolean,
-    verifiedPhone: boolean,
-    stateId: number | null,
-    municipalityId: number | null,
-    createdAt: Date,
-    updatedAt: Date,
-    createdBy: number | null
+    imageProfile: string | null = null,
+    phoneNumber: string | null = null,
+    reputationScore: number = 0,
+    googleUserId: string | null = null,
+    status: UserStatus = UserStatus.PENDING,
+    verifiedEmail: boolean = false,
+    verifiedPhone: boolean = false,
+    emailVerifiedAt: Date | null = null,
+    phoneVerifiedAt: Date | null = null,
+    stateId: number | null = null,
+    municipalityId: number | null = null,
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
+    createdBy: number | null = null
   ) {
     this.id = id;
     this.names = names;
@@ -117,6 +149,8 @@ export class User {
     this.status = status;
     this.verifiedEmail = verifiedEmail;
     this.verifiedPhone = verifiedPhone;
+    this.emailVerifiedAt = emailVerifiedAt;
+    this.phoneVerifiedAt = phoneVerifiedAt;
     this.stateId = stateId;
     this.municipalityId = municipalityId;
     this.createdAt = createdAt;
