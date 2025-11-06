@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { LoginUserUseCase } from '../../../application/use-case/login-user.use-case';
+import { LoginUserUseCase } from '../../../application/use-cases/login-user.use-case';
 import { LoginUserDto } from '../../../application/dtos/login-user.dto';
 
 export class LoginUserController {

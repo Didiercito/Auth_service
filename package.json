@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --exit-child server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --exit-child src/server.ts",
     "tsc": "tsc",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"

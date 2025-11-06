@@ -1,6 +1,6 @@
 services:
-  auth-api-1:
-    container_name: auth-api-1
+  auth-user-api-1:
+    container_name: auth-user-api-1
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,8 +10,8 @@ services:
       NODE_ENV: ${NODE_ENV}
       PORT: ${AUTH_API_PORT}
       HOST: ${HOST}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
@@ -23,56 +23,26 @@ services:
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
       BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
-      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
       RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
       RABBITMQ_QUEUE_AUTH: ${RABBITMQ_QUEUE_AUTH}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - auth-network
-    restart: unless-stopped
 
-  auth-api-2:
-    container_name: auth-api-2
-    build:
-      context: .
-      dockerfile: Dockerfile
-    expose:
-      - "${AUTH_API_PORT}"
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      PORT: ${AUTH_API_PORT}
-      HOST: ${HOST}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
-      DB_LOGGING: ${DB_LOGGING}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
-      BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
-      RABBITMQ_URL: ${RABBITMQ_URL}
-      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
-      RABBITMQ_QUEUE_AUTH: ${RABBITMQ_QUEUE_AUTH}
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
     networks:
-      - auth-network
+      - auth-user-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${AUTH_API_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  auth-api-3:
-    container_name: auth-api-3
+  auth-user-api-2:
+    container_name: auth-user-api-2
     build:
       context: .
       dockerfile: Dockerfile
@@ -82,8 +52,8 @@ services:
       NODE_ENV: ${NODE_ENV}
       PORT: ${AUTH_API_PORT}
       HOST: ${HOST}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
@@ -95,7 +65,7 @@ services:
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
       BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
-      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
       RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
       RABBITMQ_QUEUE_AUTH: ${RABBITMQ_QUEUE_AUTH}
     depends_on:
@@ -104,11 +74,57 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - auth-network
+      - auth-user-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${AUTH_API_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  auth-user-api-3: # Réplica 3
+    container_name: auth-user-api-3
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - "${AUTH_API_PORT}"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${AUTH_API_PORT}
+      HOST: ${HOST}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      DB_LOGGING: ${DB_LOGGING}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
+      RABBITMQ_QUEUE_AUTH: ${RABBITMQ_QUEUE_AUTH}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - auth-user-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${AUTH_API_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   postgres:
-    container_name: auth-postgres-db
+    container_name: auth-user-postgres-db
     image: postgres:16-alpine
     ports:
       - "${POSTGRES_PORT_HOST}:5432"
@@ -120,16 +136,17 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - auth-network
+      - auth-user-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+
   rabbitmq:
-    container_name: auth-rabbitmq
+    container_name: auth-user-rabbitmq
     image: rabbitmq:3.13-management-alpine
     ports:
       - "${RABBITMQ_HOST_PORT}:5672"
@@ -140,31 +157,31 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
-      - auth-network
+      - auth-user-network
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 30s
       timeout: 10s
       retries: 5
 
   nginx:
-    container_name: auth-nginx
+    container_name: auth-user-nginx
     image: nginx:alpine
     ports:
       - "${NGINX_HOST_PORT}:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d/app.conf:/etc/nginx/conf.d/auth_load_balancer.conf:ro
+      - ./nginx/conf.d/app.conf:/etc/nginx/conf.d/auth_user_load_balancer.conf:ro
     depends_on:
-      auth-api-1:
-        condition: service_healthy
-      auth-api-2:
-        condition: service_healthy
-      auth-api-3:
-        condition: service_healthy
+      auth-user-api-1:
+        condition: service_healthy 
+      auth-user-api-2:
+        condition: service_healthy 
+      auth-user-api-3:
+        condition: service_healthy 
     networks:
-      - auth-network
+      - auth-user-network
     restart: unless-stopped
 
 volumes:
@@ -174,5 +191,5 @@ volumes:
     driver: local
 
 networks:
-  auth-network:
+  auth-user-network:
     driver: bridge

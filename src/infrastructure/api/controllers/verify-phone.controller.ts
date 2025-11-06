@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { VerifyPhoneUseCase } from '../../../application/use-case/verify-phone.use-case';
+import { VerifyPhoneUseCase } from '../../../application/use-cases/verify-phone.use-case';
 import { VerifyPhoneDto } from '../../../application/dtos/verify-phone.dto';
 
 export class VerifyPhoneController {

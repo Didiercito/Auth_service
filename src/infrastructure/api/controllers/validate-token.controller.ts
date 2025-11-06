@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { ValidateTokenUseCase } from '../../../application/use-case/validate-token.use-case';
+import { ValidateTokenUseCase } from '../../../application/use-cases/validate-token.use-case';
 import { ValidateTokenDto } from '../../../application/dtos/validate-token.dto';
 
 export class ValidateTokenController {

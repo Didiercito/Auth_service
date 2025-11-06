@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { VerifyEmailUseCase } from '../../../application/use-case/verify-email.use-case';
+import { VerifyEmailUseCase } from '../../../application/use-cases/verify-email.use-case';
 import { VerifyEmailDto } from '../../../application/dtos/verify-email.dto';
 
 export class VerifyEmailController {

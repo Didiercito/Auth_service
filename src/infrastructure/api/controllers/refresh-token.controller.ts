@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { RefreshTokenUseCase } from '../../../application/use-case/refresh-token.use-case';
+import { RefreshTokenUseCase } from '../../../application/use-cases/refresh-token.use-case';
 import { RefreshTokenDto } from '../../../application/dtos/refresh-token.dto';
 
 export class RefreshTokenController {

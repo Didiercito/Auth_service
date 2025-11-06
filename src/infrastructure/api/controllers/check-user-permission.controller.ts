@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CheckUserPermissionUseCase, CheckUserPermissionDto } from '../../../application/use-case/check-user-permission.use-case';
+import { CheckUserPermissionUseCase, CheckUserPermissionDto } from '../../../application/use-cases/check-user-permission.use-case';
 
 export class CheckUserPermissionController {
   constructor(private readonly checkUserPermissionUseCase: CheckUserPermissionUseCase) {}

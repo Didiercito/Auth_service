@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { RemoveRoleUseCase } from '../../../application/use-case/remove-role.use-case';
+import { RemoveRoleUseCase } from '../../../application/use-cases/remove-role.use-case';
 import { RemoveRoleDto } from '../../../application/dtos/remove-role.dto';
 
 export class RemoveRoleController {

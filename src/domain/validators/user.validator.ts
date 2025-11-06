@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entitie';
+import { User } from '../entities/user.entity';
 import { BaseValidator } from './validator';
 
 export class UserValidator extends BaseValidator<User> {

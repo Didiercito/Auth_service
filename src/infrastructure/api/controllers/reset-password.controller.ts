@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { ResetPasswordUseCase } from '../../../application/use-case/reset-password.use-case';
+import { ResetPasswordUseCase } from '../../../application/use-cases/reset-password.use-case';
 import { ResetPasswordDto } from '../../../application/dtos/reset-password.dto';
 
 export class ResetPasswordController {

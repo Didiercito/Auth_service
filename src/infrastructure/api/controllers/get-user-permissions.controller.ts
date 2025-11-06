@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { GetUserPermissionsUseCase } from '../../../application/use-case/get-user-permissions.use-case';
+import { GetUserPermissionsUseCase } from '../../../application/use-cases/get-user-permissions.use-case';
 import { GetUserPermissionsDto } from '../../../application/dtos/get-user-permissions.dto';
 
 export class GetUserPermissionsController {

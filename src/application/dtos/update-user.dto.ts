@@ -9,7 +9,7 @@ import {
   Min,
   Max
 } from 'class-validator';
-import { UserStatus } from '../../domain/entities/user.entitie';
+import { UserStatus } from '../../domain/entities/user.entity';
 
 export class UpdateUserDto {
   @IsNotEmpty()

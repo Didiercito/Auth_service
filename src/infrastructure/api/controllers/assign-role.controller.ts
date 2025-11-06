@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { AssignRoleUseCase } from '../../../application/use-case/assign-role.use-case';
+import { AssignRoleUseCase } from '../../../application/use-cases/assign-role.use-case';
 import { AssignRoleDto } from '../../../application/dtos/assign-role.dto';
 
 export class AssignRoleController {

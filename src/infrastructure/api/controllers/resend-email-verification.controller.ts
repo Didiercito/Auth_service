@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { ResendEmailVerificationUseCase } from '../../../application/use-case/resend-email-verification.use-case';
+import { ResendEmailVerificationUseCase } from '../../../application/use-cases/resend-email-verification.use-case';
 import { ResendEmailVerificationDto } from '../../../application/dtos/resend-email-verification.dto';
 
 export class ResendEmailVerificationController {
