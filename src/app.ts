@@ -1,4 +1,4 @@
-import express, { Response } from 'express';
+import express, { Response} from 'express';
 import cors from 'cors';
 import { config } from 'dotenv';
 import Authroutes from './infrastructure/api/routes/auth.routes';
@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/health', (res: Response) => {
   res.json({
     success: true,
-    service: 'User Service',
+    service: 'Auth-User Service',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
