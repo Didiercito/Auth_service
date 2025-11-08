@@ -18,8 +18,6 @@ const startServer = async () => {
 
     console.log('📨 Connecting to RabbitMQ...');
     console.log('--- DEBUGGING RABBITMQ ---');
-    console.log('Intentando conectar con URL:', process.env.RABBITMQ_URL);
-    console.log('----------------------------');
     await eventPublisher.connect();
     
     app.listen((PORT), () => {

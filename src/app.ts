@@ -11,7 +11,6 @@ import skillRoutes from './infrastructure/api/routes/skill.routes';
 import availabilityRoutes from './infrastructure/api/routes/availability.routes';
 import scheduleRoutes from './infrastructure/api/routes/schedule.routes';
 import reputationRoutes from './infrastructure/api/routes/reputation.routes';
-
 config();
 
 const app = express();
