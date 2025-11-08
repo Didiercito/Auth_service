@@ -1,9 +1,12 @@
+import { config } from 'dotenv';
+config();
+
 import app from './app';
 import { initializeDatabase, closeDatabase } from './config/data-source';
 import { eventPublisher } from './infrastructure/api/dependencies/dependencies';
 import { runSeeds } from './config/seed/seed';
 
-const PORT = process.env.PORT;
+const PORT = parseInt(process.env.AUTH_API_PORT || '3001');
 
 const startServer = async () => {
   try {
@@ -20,7 +23,7 @@ const startServer = async () => {
     console.log('--- DEBUGGING RABBITMQ ---');
     await eventPublisher.connect();
     
-    app.listen((PORT), () => {
+    app.listen(PORT, () => {
       console.log(`Server running in port: http://localhost:${PORT}`);
     });
   } catch (error) {

@@ -1,17 +1,15 @@
 import express, { Response} from 'express';
 import cors from 'cors';
-import { config } from 'dotenv';
 import Authroutes from './infrastructure/api/routes/auth.routes';
-import PasswordRoutes from './infrastructure/api/routes/password.routes'
-import permissonRoutes from './infrastructure/api/routes/permission.routes'
-import RoleRoutes from './infrastructure/api/routes/role.routes'
-import VerificationRoutes from './infrastructure/api/routes/verification.routes'
+import PasswordRoutes from './infrastructure/api/routes/password.routes';
+import permissonRoutes from './infrastructure/api/routes/permission.routes';
+import RoleRoutes from './infrastructure/api/routes/role.routes';
+import VerificationRoutes from './infrastructure/api/routes/verification.routes';
 import userRoutes from './infrastructure/api/routes/user.routes';
 import skillRoutes from './infrastructure/api/routes/skill.routes';
 import availabilityRoutes from './infrastructure/api/routes/availability.routes';
 import scheduleRoutes from './infrastructure/api/routes/schedule.routes';
 import reputationRoutes from './infrastructure/api/routes/reputation.routes';
-config();
 
 const app = express();
 app.use(cors());
@@ -30,15 +28,14 @@ app.get('/health', (res: Response) => {
 });
 
 app.use('/api/v1/auth', Authroutes);
-app.use('/api/v1/password', PasswordRoutes)
-app.use('/api/v1/permission', permissonRoutes)
-app.use('/api/v1/role', RoleRoutes)
-app.use('/api/v1/verification', VerificationRoutes)
+app.use('/api/v1/password', PasswordRoutes);
+app.use('/api/v1/permission', permissonRoutes);
+app.use('/api/v1/role', RoleRoutes);
+app.use('/api/v1/verification', VerificationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/reputation', reputationRoutes);
-
 
 export default app;
