@@ -1,0 +1,54 @@
+GET: states-municipies.bim2.xyz/api/states
+
+response: 
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "Aguascalientes"
+        },
+        {
+            "id": 2,
+            "name": "Baja California"
+        },
+        {
+            "id": 3,
+            "name": "Baja California Sur"
+        },
+        {
+            "id": 4,
+            "name": "Campeche"
+        },
+        {
+            "id": 5,
+            "name": "Coahuila"
+        },
+        {
+            "id": 6,
+            "name": "Colima"
+        },
+        {
+            "id": 7,
+            "name": "Chiapas"
+        },
+        {
+            "id": 8,
+            "name": "Chihuahua"
+        },
+        {
+            "id": 9,
+            "name": "Ciudad de México"
+        },
+        {
+            "id": 10,
+            "name": "Durango"
+        }
+    ],
+    "totalItems": 32,
+    "totalPages": 4,
+    "currentPage": 1
+}
+
+
+GET: states-municipies.bim2.xyz/api/states/1/municipalities
+
