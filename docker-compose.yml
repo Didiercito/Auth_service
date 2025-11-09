@@ -30,7 +30,7 @@ services:
       - auth-user-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${AUTH_API_PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:${AUTH_API_PORT}/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -67,7 +67,7 @@ services:
       - auth-user-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${AUTH_API_PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:${AUTH_API_PORT}/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -104,7 +104,7 @@ services:
       - auth-user-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${AUTH_API_PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:${AUTH_API_PORT}/health"]
       interval: 30s
       timeout: 10s
       retries: 3
