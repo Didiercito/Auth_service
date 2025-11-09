@@ -33,7 +33,6 @@ export class RegisterUserController {
       }
 
       const result = await this.registerUserUseCase.execute(dto);
-      
       res.status(201).json({
         success: true,
         message: result.message,
@@ -46,7 +45,9 @@ export class RegisterUserController {
             status: result.user.status,
             verifiedEmail: result.user.verifiedEmail,
             verifiedPhone: result.user.verifiedPhone
-          }
+          },
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
         }
       });
     } catch (error: any) {
