@@ -52,7 +52,6 @@ import { AssignVolunteerRoleUseCase } from '../../../application/use-cases/assig
 import { CompleteProfileUseCase } from '../../../application/use-cases/complete-profile.use-case';
 import { RegisterKitchenAdminUseCase } from '../../../application/use-cases/register-kitchen-admin.use-case';
 
-
 import { RegisterUserController } from '../controllers/register-user.controller';
 import { LoginUserController } from '../controllers/login-user.controller';
 import { ValidateTokenController } from '../controllers/validate-token.controller';
@@ -104,23 +103,20 @@ const passwordHasher = new BcryptPasswordHasherService();
 const tokenGenerator = new JwtTokenGeneratorService();
 const eventPublisher = new RabbitMQEventPublisherService();
 
-// --- INICIO CORRECCIÓN DE INYECCIÓN DE DEPENDENCIAS ---
-
-// CORRECCIÓN CLAVE: RegisterUserUseCase ahora solo recibe 3 dependencias (ya no necesita emailVerificationRepository ni tokenGenerator)
+// CORRECTED: RegisterUserUseCase now receives 5 arguments
 const registerUserUseCase = new RegisterUserUseCase(
   userRepository,
+  roleRepository,
   passwordHasher,
+  tokenGenerator,
   eventPublisher
 );
-// Se mantiene la inyección original de RegisterKitchenAdminUseCase
 const registerKitchenAdminUseCase = new RegisterKitchenAdminUseCase(
   userRepository,
   roleRepository,
   passwordHasher,
   eventPublisher
 );
-
-// --- FIN CORRECCIÓN DE INYECCIÓN DE DEPENDENCIAS ---
 
 
 const loginUserUseCase = new LoginUserUseCase(
@@ -140,53 +136,45 @@ const refreshTokenUseCase = new RefreshTokenUseCase(
   userRepository,
   roleRepository
 );
-
 const verifyEmailUseCase = new VerifyEmailUseCase(
   userRepository,
   emailVerificationRepository,
   eventPublisher
 );
-
 const resendEmailVerificationUseCase = new ResendEmailVerificationUseCase(
   userRepository,
   emailVerificationRepository,
   tokenGenerator,
   eventPublisher
 );
-
 const verifyPhoneUseCase = new VerifyPhoneUseCase(
   userRepository,
   phoneVerificationRepository,
   eventPublisher
 );
-
 const resendPhoneVerificationUseCase = new ResendPhoneVerificationUseCase(
   userRepository,
   phoneVerificationRepository,
   tokenGenerator,
   eventPublisher
 );
-
 const requestPasswordResetUseCase = new RequestPasswordResetUseCase(
   userRepository,
   passwordResetTokenRepository,
   tokenGenerator,
   eventPublisher
 );
-
 const resetPasswordUseCase = new ResetPasswordUseCase(
   userRepository,
   passwordResetTokenRepository,
   passwordHasher,
   eventPublisher
 );
-
 const assignRoleUseCase = new AssignRoleUseCase(
   userRepository,
   roleRepository,
   eventPublisher
 );
-
 const removeRoleUseCase = new RemoveRoleUseCase(
   userRepository,
   roleRepository,
@@ -196,7 +184,6 @@ const removeRoleUseCase = new RemoveRoleUseCase(
 const getUserPermissionsUseCase = new GetUserPermissionsUseCase(
   permissionRepository
 );
-
 const checkUserPermissionUseCase = new CheckUserPermissionUseCase(
   permissionRepository
 );
@@ -206,7 +193,6 @@ const checkUserPermissionUseCase = new CheckUserPermissionUseCase(
 const getUserByIdUseCase = new GetUserByIdUseCase(userRepository);
 
 const getUsersPaginatedUseCase = new GetUsersPaginatedUseCase(userRepository);
-
 const updateUserUseCase = new UpdateUserUseCase(userRepository);
 
 const updateProfileUseCase = new UpdateProfileUseCase(userRepository);
@@ -214,7 +200,6 @@ const updateProfileUseCase = new UpdateProfileUseCase(userRepository);
 const deleteUserUseCase = new DeleteUserUseCase(userRepository);
 
 const getSkillsUseCase = new GetSkillsUseCase(skillRepository);
-
 const getUserSkillsUseCase = new GetUserSkillsUseCase(
   userSkillRepository,
   userRepository
@@ -225,7 +210,6 @@ const addUserSkillUseCase = new AddUserSkillUseCase(
   userRepository,
   skillRepository
 );
-
 const removeUserSkillUseCase = new RemoveUserSkillUseCase(
   userSkillRepository,
   userRepository
@@ -235,7 +219,6 @@ const setUserAvailabilityUseCase = new SetUserAvailabilityUseCase(
   userAvailabilityRepository,
   userRepository
 );
-
 const getUserAvailabilityUseCase = new GetUserAvailabilityUseCase(
   userAvailabilityRepository,
   userRepository
@@ -246,7 +229,6 @@ const checkUserAvailabilityUseCase = new CheckUserAvailabilityUseCase(
   userScheduleRepository,
   userRepository
 );
-
 const createUserScheduleUseCase = new CreateUserScheduleUseCase(
   userScheduleRepository,
   userRepository
@@ -255,7 +237,6 @@ const createUserScheduleUseCase = new CreateUserScheduleUseCase(
 const updateUserScheduleUseCase = new UpdateUserScheduleUseCase(
   userScheduleRepository
 );
-
 const deleteUserScheduleUseCase = new DeleteUserScheduleUseCase(
   userScheduleRepository
 );
@@ -264,7 +245,6 @@ const getUserSchedulesUseCase = new GetUserSchedulesUseCase(
   userScheduleRepository,
   userRepository
 );
-
 const updateUserReputationUseCase = new UpdateUserReputationUseCase(
   userRepository,
   userReputationHistoryRepository
@@ -274,7 +254,6 @@ const getUserReputationHistoryUseCase = new GetUserReputationHistoryUseCase(
   userRepository,
   userReputationHistoryRepository
 );
-
 const assignVolunteerRoleUseCase = new AssignVolunteerRoleUseCase(
   userRepository,
   roleRepository
@@ -286,7 +265,6 @@ const completeProfileUseCase = new CompleteProfileUseCase(
   skillRepository,
   assignVolunteerRoleUseCase
 );
-
 export const registerUserController = new RegisterUserController(registerUserUseCase);
 export const registerKitchenAdminController = new RegisterKitchenAdminController(registerKitchenAdminUseCase);
 export const loginUserController = new LoginUserController(loginUserUseCase);

@@ -5,15 +5,17 @@ import {
   deleteUserScheduleController,
   getUserSchedulesController
 } from '../dependencies/dependencies';
+import { AuthMiddleware } from '../../../middleware/auth.middleware'; 
 
 const router = Router();
+const authMiddleware = new AuthMiddleware(); 
 
-router.get('/user/:userId', getUserSchedulesController.handle.bind(getUserSchedulesController));
+router.get('/user/:userId', authMiddleware.authenticate, getUserSchedulesController.handle.bind(getUserSchedulesController));
 
-router.post('/', createUserScheduleController.handle.bind(createUserScheduleController));
+router.post('/', authMiddleware.authenticate, createUserScheduleController.handle.bind(createUserScheduleController));
 
-router.put('/:id', updateUserScheduleController.handle.bind(updateUserScheduleController));
+router.put('/:id', authMiddleware.authenticate, updateUserScheduleController.handle.bind(updateUserScheduleController));
 
-router.delete('/:id', deleteUserScheduleController.handle.bind(deleteUserScheduleController));
+router.delete('/:id', authMiddleware.authenticate, deleteUserScheduleController.handle.bind(deleteUserScheduleController));
 
 export default router;
