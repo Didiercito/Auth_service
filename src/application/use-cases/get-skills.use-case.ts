@@ -1,4 +1,3 @@
-import { GetSkillsDto } from '../dtos/get-skills.dto';
 import { ISkillRepository } from '../../domain/interfaces/skill.repository.interface';
 import { Skill } from '../../domain/entities/skill.entity';
 
@@ -13,16 +12,18 @@ export interface PaginatedResult<T> {
 export class GetSkillsUseCase {
   constructor(private readonly skillRepository: ISkillRepository) {}
 
-  async execute(dto: GetSkillsDto): Promise<PaginatedResult<Skill>> {
-    const { page = 1, limit = 50, search, isActive = true } = dto;
-
+  async execute(dto: any): Promise<PaginatedResult<Skill>> {
+    const page = parseInt(dto.page) || 1;
+    const limit = parseInt(dto.limit) || 50;
+    const search = dto.search;
+    const isActive = dto.isActive !== undefined ? (dto.isActive === 'true' || dto.isActive === true) : true;
+    
     const result = await this.skillRepository.findPaginated({
       page,
       limit,
       search,
       isActive
     });
-
     const totalPages = Math.ceil(result.total / limit);
 
     return {

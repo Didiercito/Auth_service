@@ -1,7 +1,6 @@
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { IPhoneVerificationRepository } from '../../domain/interfaces/phone-verification.repository.interface';
 import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
-import { VerifyPhoneDto } from '../dtos/verify-phone.dto';
 import { PhoneVerificationValidator } from '../../domain/validators/phone-verification.validator';
 
 export class VerifyPhoneUseCase {
@@ -11,7 +10,11 @@ export class VerifyPhoneUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: VerifyPhoneDto): Promise<{ message: string }> {
+  async execute(dto: any): Promise<{ message: string }> {
+    if (!dto.userId || !dto.code) {
+      throw { http_status: 400, message: 'User ID and code are required' };
+    }
+    
     const verification = await this.phoneVerificationRepository.findLatestByUserId(dto.userId);
     if (!verification) {
       throw {
@@ -57,7 +60,6 @@ export class VerifyPhoneUseCase {
       phoneNumber: user.phoneNumber,
       timestamp: new Date().toISOString()
     });
-    
     return {
       message: 'Phone number verified successfully'
     };

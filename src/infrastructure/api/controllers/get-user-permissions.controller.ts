@@ -1,33 +1,28 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { GetUserPermissionsUseCase } from '../../../application/use-cases/get-user-permissions.use-case';
-import { GetUserPermissionsDto } from '../../../application/dtos/get-user-permissions.dto';
 
 export class GetUserPermissionsController {
   constructor(private readonly getUserPermissionsUseCase: GetUserPermissionsUseCase) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const dto = plainToClass(GetUserPermissionsDto, {
-        userId: parseInt(req.params.userId) || req.user?.userId
-      });
-
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      const userIdParam = parseInt(req.params.userId);
+      const userIdToken = req.user?.userId;
+      
+      const userId = userIdParam || userIdToken;
+      
+      if (isNaN(userId!)) {
+        res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'User ID is required'
         });
         return;
       }
+      
+      const dto = { userId: userId };
 
       const result = await this.getUserPermissionsUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         data: result

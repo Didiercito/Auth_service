@@ -1,7 +1,6 @@
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { IRoleRepository } from '../../domain/interfaces/role.repository.interface';
-import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface'; 
-import { AssignRoleDto } from '../dtos/assign-role.dto';
+import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
 
 export class AssignRoleUseCase {
   constructor(
@@ -10,7 +9,14 @@ export class AssignRoleUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: AssignRoleDto): Promise<{ message: string }> {
+  async execute(dto: any): Promise<{ message: string }> {
+    if (!dto.userId || !dto.roleId) {
+      throw {
+        http_status: 400,
+        message: 'User ID and Role ID are required'
+      };
+    }
+
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
       throw {
@@ -41,7 +47,6 @@ export class AssignRoleUseCase {
       dto.roleId,
       dto.assignedBy
     );
-    
     await this.eventPublisher.publish('user.role.assigned', {
       userId: dto.userId,
       roleId: dto.roleId,
@@ -49,7 +54,6 @@ export class AssignRoleUseCase {
       assignedBy: dto.assignedBy,
       timestamp: new Date().toISOString()
     });
-
     return {
       message: `Role '${role.name}' assigned successfully to user`
     };

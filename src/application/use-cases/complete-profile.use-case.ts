@@ -1,4 +1,3 @@
-import { CompleteProfileDto } from '../dtos/complete-profile.dto';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { IUserSkillRepository } from '../../domain/interfaces/user-skill.repository.interface';
 import { ISkillRepository } from '../../domain/interfaces/skill.repository.interface';
@@ -13,9 +12,13 @@ export class CompleteProfileUseCase {
     private readonly assignVolunteerRoleUseCase: AssignVolunteerRoleUseCase
   ) {}
 
-  async execute(dto: CompleteProfileDto): Promise<{
+  async execute(dto: any): Promise<{
     message: string;
   }> {
+    if (!dto.userId) {
+       throw { http_status: 400, message: 'User ID is required' };
+    }
+
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
       throw {
@@ -47,7 +50,6 @@ export class CompleteProfileUseCase {
     }
 
     await this.assignVolunteerRoleUseCase.execute(dto.userId);
-    
     return {
       message: 'Profile completed successfully. You can now login.'
     };

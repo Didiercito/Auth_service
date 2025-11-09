@@ -1,31 +1,24 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { ResendEmailVerificationUseCase } from '../../../application/use-cases/resend-email-verification.use-case';
-import { ResendEmailVerificationDto } from '../../../application/dtos/resend-email-verification.dto';
 
 export class ResendEmailVerificationController {
   constructor(private readonly resendEmailVerificationUseCase: ResendEmailVerificationUseCase) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const [dto] = plainToClass(ResendEmailVerificationDto, req.body);
-
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      const email = req.body.email;
+      
+      if (!email) {
+        res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'Email is required'
         });
         return;
       }
-
+      
+      const dto = { email: email };
       const result = await this.resendEmailVerificationUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: result.message

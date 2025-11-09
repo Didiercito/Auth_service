@@ -1,4 +1,3 @@
-import { GetReputationHistoryDto } from '../dtos/get-reputation-history.dto';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { IUserReputationHistoryRepository } from '../../domain/interfaces/user-reputation-history.repository.interface';
 import { UserReputationHistory } from '../../domain/entities/user-reputation-history.entity';
@@ -17,14 +16,21 @@ export class GetUserReputationHistoryUseCase {
     private readonly reputationHistoryRepository: IUserReputationHistoryRepository
   ) {}
 
-  async execute(dto: GetReputationHistoryDto): Promise<PaginatedResult<UserReputationHistory>> {
+  async execute(dto: any): Promise<PaginatedResult<UserReputationHistory>> {
+    if (!dto.userId) {
+      throw new Error('User ID is required');
+    }
+    
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
       throw new Error('User not found');
     }
 
-    const { page = 1, limit = 20, startDate, endDate } = dto;
-
+    const page = parseInt(dto.page) || 1;
+    const limit = parseInt(dto.limit) || 20;
+    const startDate = dto.startDate ? new Date(dto.startDate) : undefined;
+    const endDate = dto.endDate ? new Date(dto.endDate) : undefined;
+    
     const result = await this.reputationHistoryRepository.findByUserIdPaginated({
       userId: dto.userId,
       page,
@@ -32,7 +38,6 @@ export class GetUserReputationHistoryUseCase {
       startDate,
       endDate
     });
-
     const totalPages = Math.ceil(result.total / limit);
 
     return {

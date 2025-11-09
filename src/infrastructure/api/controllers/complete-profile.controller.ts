@@ -1,26 +1,34 @@
 import { Request, Response } from 'express';
 import { CompleteProfileUseCase } from '../../../application/use-cases/complete-profile.use-case';
-import { CompleteProfileDto } from '../../../application/dtos/complete-profile.dto';
 
 export class CompleteProfileController {
   constructor(private readonly completeProfileUseCase: CompleteProfileUseCase) {}
 
   handle = async (req: Request, res: Response): Promise<void> => {
     try {
-      const userId = req.user?.userId;
+      const userId = parseInt(req.body.userId);
       
-      if (!userId) {
-        res.status(401).json({
+      if (isNaN(userId)) {
+         res.status(400).json({
           success: false,
-          message: 'Unauthorized: User ID not found in token'
+          message: 'User ID is required and must be a number'
         });
         return;
       }
       
-      const dto = new CompleteProfileDto(
-        userId, // USAMOS EL ID DEL TOKEN
-        req.body.skillIds
-      );
+      const skillIds = req.body.skillIds;
+      if (skillIds && !Array.isArray(skillIds)) {
+        res.status(400).json({
+          success: false,
+          message: 'skillIds must be an array'
+        });
+        return;
+      }
+      
+      const dto = {
+        userId: userId,
+        skillIds: skillIds
+      };
       
       const result = await this.completeProfileUseCase.execute(dto);
 

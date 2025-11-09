@@ -1,8 +1,5 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { ValidateTokenUseCase } from '../../../application/use-cases/validate-token.use-case';
-import { ValidateTokenDto } from '../../../application/dtos/validate-token.dto';
 
 export class ValidateTokenController {
   constructor(private readonly validateTokenUseCase: ValidateTokenUseCase) {}
@@ -10,22 +7,26 @@ export class ValidateTokenController {
   async handle(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization?.replace('Bearer ', '') || req.body.token;
-      const dto = plainToClass(ValidateTokenDto, { token });
-
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      
+      if (!token) {
+        res.status(401).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'Token is required'
         });
         return;
       }
+      
+      const dto = { token: token };
 
       const result = await this.validateTokenUseCase.execute(dto);
+      
+      if (!result.isValid) {
+        res.status(401).json({
+          success: false,
+          message: 'Invalid or expired token'
+        });
+        return;
+      }
 
       res.status(200).json({
         success: true,

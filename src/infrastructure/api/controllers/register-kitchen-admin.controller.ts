@@ -1,8 +1,5 @@
 import { Request, Response } from 'express';
 import { RegisterKitchenAdminUseCase } from '../../../application/use-cases/register-kitchen-admin.use-case';
-import { RegisterKitchenAdminDto } from '../../../application/dtos/register-kitchen-admin.dto';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
 
 export class RegisterKitchenAdminController {
   constructor(
@@ -11,17 +8,13 @@ export class RegisterKitchenAdminController {
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const dto = plainToInstance(RegisterKitchenAdminDto, req.body);
-
-      const errors = await validate(dto);
-      if (errors.length > 0) {
+      const dto = req.body;
+      
+      // Mínima validación de existencia de bloques
+      if (!dto.responsibleData || !dto.kitchenData || !dto.locationData) {
         res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'Missing required data sections (responsibleData, kitchenData, locationData)'
         });
         return;
       }
@@ -31,7 +24,6 @@ export class RegisterKitchenAdminController {
       res.status(201).json(result);
     } catch (error: any) {
       console.error('Error in RegisterKitchenAdminController:', error);
-
       if (error.http_status) {
         res.status(error.http_status).json({
           success: false,

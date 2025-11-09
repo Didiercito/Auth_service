@@ -1,34 +1,32 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { AssignRoleUseCase } from '../../../application/use-cases/assign-role.use-case';
-import { AssignRoleDto } from '../../../application/dtos/assign-role.dto';
 
 export class AssignRoleController {
   constructor(private readonly assignRoleUseCase: AssignRoleUseCase) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const [dto] = plainToClass(AssignRoleDto, {
-        ...req.body,
-        assignedBy: req.user?.userId 
-      });
+      const userId = parseInt(req.body.userId);
+      const roleId = parseInt(req.body.roleId);
+      const assignedBy = req.user?.userId;
 
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      if (isNaN(userId) || isNaN(roleId)) {
+         res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'User ID and Role ID must be valid numbers'
         });
         return;
       }
+      
+      const dto = {
+        userId: userId,
+        roleId: roleId,
+        isPrimary: req.body.isPrimary || false,
+        assignedBy: assignedBy
+      };
 
       const result = await this.assignRoleUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: result.message

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { CheckUserAvailabilityUseCase } from '../../../application/use-cases/check-user-availability.use-case';
-import { CheckAvailabilityDto } from '../../../application/dtos/check-availability.dto';
 
 export class CheckUserAvailabilityController {
   constructor(private readonly checkUserAvailabilityUseCase: CheckUserAvailabilityUseCase) {}
@@ -8,6 +7,9 @@ export class CheckUserAvailabilityController {
   handle = async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = parseInt(req.params.userId);
+      const startDateTime = new Date(req.body.startDateTime);
+      const endDateTime = new Date(req.body.endDateTime);
+      const dayOfWeek = req.body.dayOfWeek;
 
       if (isNaN(userId)) {
         res.status(400).json({
@@ -17,9 +19,6 @@ export class CheckUserAvailabilityController {
         return;
       }
 
-      const startDateTime = new Date(req.body.startDateTime);
-      const endDateTime = new Date(req.body.endDateTime);
-
       if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
         res.status(400).json({
           success: false,
@@ -28,13 +27,13 @@ export class CheckUserAvailabilityController {
         return;
       }
 
-      const dto = new CheckAvailabilityDto(
-        userId,
-        startDateTime,
-        endDateTime,
-        req.body.dayOfWeek
-      );
-
+      const dto = {
+        userId: userId,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+        dayOfWeek: dayOfWeek
+      };
+      
       const result = await this.checkUserAvailabilityUseCase.execute(dto);
 
       res.status(200).json({

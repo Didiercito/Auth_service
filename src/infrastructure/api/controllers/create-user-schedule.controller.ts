@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { CreateUserScheduleUseCase } from '../../../application/use-cases/create-user-schedule.use-case';
-import { CreateScheduleDto } from '../../../application/dtos/create-schedule.dto';
 
 export class CreateUserScheduleController {
   constructor(private readonly createUserScheduleUseCase: CreateUserScheduleUseCase) {}
@@ -8,6 +7,8 @@ export class CreateUserScheduleController {
   handle = async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = req.user?.userId;
+      const startDateTime = new Date(req.body.startDateTime);
+      const endDateTime = new Date(req.body.endDateTime);
 
       if (!userId) {
         res.status(401).json({
@@ -17,9 +18,6 @@ export class CreateUserScheduleController {
         return;
       }
 
-      const startDateTime = new Date(req.body.startDateTime);
-      const endDateTime = new Date(req.body.endDateTime);
-
       if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
         res.status(400).json({
           success: false,
@@ -28,14 +26,14 @@ export class CreateUserScheduleController {
         return;
       }
 
-      const dto = new CreateScheduleDto(
-        userId,
-        startDateTime,
-        endDateTime,
-        req.body.notes,
-        req.body.eventId,
-        userId
-      );
+      const dto = {
+        userId: userId,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+        notes: req.body.notes,
+        eventId: req.body.eventId ? parseInt(req.body.eventId) : undefined,
+        createdBy: userId
+      };
 
       const schedule = await this.createUserScheduleUseCase.execute(dto);
 

@@ -1,31 +1,25 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { VerifyPhoneUseCase } from '../../../application/use-cases/verify-phone.use-case';
-import { VerifyPhoneDto } from '../../../application/dtos/verify-phone.dto';
 
 export class VerifyPhoneController {
   constructor(private readonly verifyPhoneUseCase: VerifyPhoneUseCase) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const [dto] = plainToClass(VerifyPhoneDto, req.body);
-
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      const userId = parseInt(req.body.userId);
+      const code = req.body.code;
+      
+      if (isNaN(userId) || !code) {
+        res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'User ID and code are required'
         });
         return;
       }
-
+      
+      const dto = { userId: userId, code: code };
       const result = await this.verifyPhoneUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: result.message

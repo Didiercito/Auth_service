@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GetUserSchedulesUseCase } from '../../../application/use-cases/get-user-schedules.use-case';
-import { GetUserSchedulesDto } from '../../../application/dtos/get-user-schedules.dto';
 
 export class GetUserSchedulesController {
   constructor(private readonly getUserSchedulesUseCase: GetUserSchedulesUseCase) {}
@@ -20,28 +19,19 @@ export class GetUserSchedulesController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
 
-      let startDate: Date | undefined;
-      let endDate: Date | undefined;
-
-      if (req.query.startDate) {
-        startDate = new Date(req.query.startDate as string);
-      }
-
-      if (req.query.endDate) {
-        endDate = new Date(req.query.endDate as string);
-      }
-
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
       const eventId = req.query.eventId ? parseInt(req.query.eventId as string) : undefined;
 
-      const dto = new GetUserSchedulesDto(
-        userId,
-        startDate,
-        endDate,
-        eventId,
-        page,
-        limit
-      );
-
+      const dto = {
+        userId: userId,
+        startDate: startDate,
+        endDate: endDate,
+        eventId: eventId,
+        page: page,
+        limit: limit
+      };
+      
       const result = await this.getUserSchedulesUseCase.execute(dto);
 
       res.status(200).json({

@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import { GetUserAvailabilityUseCase } from '../../../application/use-cases/get-user-availability.use-case';
-import { GetUserAvailabilityDto } from '../../../application/dtos/get-user-availability.dto';
-import { DayOfWeek } from '../../../domain/entities/user-availability.entity';
 
 export class GetUserAvailabilityController {
   constructor(private readonly getUserAvailabilityUseCase: GetUserAvailabilityUseCase) {}
@@ -9,7 +7,7 @@ export class GetUserAvailabilityController {
   handle = async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = parseInt(req.params.userId);
-      const dayOfWeek = req.query.dayOfWeek as DayOfWeek;
+      const dayOfWeek = req.query.dayOfWeek as string;
 
       if (isNaN(userId)) {
         res.status(400).json({
@@ -19,7 +17,7 @@ export class GetUserAvailabilityController {
         return;
       }
 
-      const dto = new GetUserAvailabilityDto(userId, dayOfWeek);
+      const dto = { userId: userId, dayOfWeek: dayOfWeek };
       const availability = await this.getUserAvailabilityUseCase.execute(dto);
 
       res.status(200).json({

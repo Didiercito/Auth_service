@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { DeleteUserScheduleUseCase } from '../../../application/use-cases/delete-user-schedule.use-case';
-import { DeleteScheduleDto } from '../../../application/dtos/delete-schedule.dto';
 
 export class DeleteUserScheduleController {
   constructor(private readonly deleteUserScheduleUseCase: DeleteUserScheduleUseCase) {}
@@ -17,7 +16,7 @@ export class DeleteUserScheduleController {
         return;
       }
 
-      const dto = new DeleteScheduleDto(scheduleId);
+      const dto = { scheduleId: scheduleId };
       await this.deleteUserScheduleUseCase.execute(dto);
 
       res.status(200).json({

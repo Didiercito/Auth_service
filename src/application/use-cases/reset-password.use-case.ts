@@ -2,7 +2,6 @@ import { IUserRepository } from '../../domain/interfaces/user.repository.interfa
 import { IPasswordResetTokenRepository } from '../../domain/interfaces/password-reset-token.repository.interface';
 import { IPasswordHasher } from '../../domain/interfaces/password-hasher.interface';
 import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
-import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { PasswordResetTokenValidator } from '../../domain/validators/password-reset-token.validator';
 import { PasswordStrengthValidator } from '../../domain/validators/password-strength.validator';
 
@@ -14,7 +13,11 @@ export class ResetPasswordUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: ResetPasswordDto): Promise<{ message: string }> {
+  async execute(dto: any): Promise<{ message: string }> {
+    if (!dto.token || !dto.newPassword) {
+      throw { http_status: 400, message: 'Token and new password are required' };
+    }
+    
     const resetToken = await this.passwordResetTokenRepository.findByToken(dto.token);
     if (!resetToken) {
       throw {
@@ -26,14 +29,10 @@ export class ResetPasswordUseCase {
     const validator = new PasswordResetTokenValidator(resetToken);
     await validator.validateWithCustomRules();
 
-    // --- INICIO DEL CÓDIGO CORREGIDO ---
-    // Se reemplazó el bloque 'validateMinimumRequirements' por el nuevo método 'validate'
     const passwordValidator = new PasswordStrengthValidator(dto.newPassword);
     await passwordValidator.validate();
-    // --- FIN DEL CÓDIGO CORREGIDO ---
 
     const user = await this.userRepository.findById(resetToken.userId);
-
     if (!user) {
       throw {
         http_status: 404,
@@ -56,7 +55,6 @@ export class ResetPasswordUseCase {
       email: user.email,
       timestamp: new Date().toISOString()
     });
-    
     return {
       message: 'Password reset successfully'
     };

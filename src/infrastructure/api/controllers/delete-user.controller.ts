@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { DeleteUserUseCase } from '../../../application/use-cases/delete-user.use-case';
-import { DeleteUserDto } from '../../../application/dtos/delete-user.dto';
 
 export class DeleteUserController {
   constructor(private readonly deleteUserUseCase: DeleteUserUseCase) {}
@@ -17,7 +16,7 @@ export class DeleteUserController {
         return;
       }
 
-      const dto = new DeleteUserDto(userId);
+      const dto = { userId: userId };
       await this.deleteUserUseCase.execute(dto);
 
       res.status(200).json({

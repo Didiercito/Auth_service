@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { UpdateUserReputationUseCase } from '../../../application/use-cases/update-user-reputation.use-case';
-import { UpdateReputationDto } from '../../../application/dtos/update-reputation.dto';
 
 export class UpdateUserReputationController {
   constructor(private readonly updateUserReputationUseCase: UpdateUserReputationUseCase) {}
@@ -9,6 +8,7 @@ export class UpdateUserReputationController {
     try {
       const userId = parseInt(req.params.userId);
       const createdBy = req.user?.userId;
+      const changeAmount = req.body.changeAmount;
 
       if (isNaN(userId)) {
         res.status(400).json({
@@ -17,16 +17,23 @@ export class UpdateUserReputationController {
         });
         return;
       }
+      if (changeAmount === undefined) {
+         res.status(400).json({
+          success: false,
+          message: 'changeAmount is required'
+        });
+        return;
+      }
 
-      const dto = new UpdateReputationDto(
-        userId,
-        req.body.changeAmount,
-        req.body.reason,
-        req.body.details,
-        req.body.relatedEventId,
-        createdBy
-      );
-
+      const dto = {
+        userId: userId,
+        changeAmount: changeAmount,
+        reason: req.body.reason,
+        details: req.body.details,
+        relatedEventId: req.body.relatedEventId,
+        createdBy: createdBy
+      };
+      
       const history = await this.updateUserReputationUseCase.execute(dto);
 
       res.status(200).json({

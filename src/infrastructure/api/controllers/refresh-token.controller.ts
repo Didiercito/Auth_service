@@ -1,31 +1,24 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { RefreshTokenUseCase } from '../../../application/use-cases/refresh-token.use-case';
-import { RefreshTokenDto } from '../../../application/dtos/refresh-token.dto';
 
 export class RefreshTokenController {
   constructor(private readonly refreshTokenUseCase: RefreshTokenUseCase) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const [dto] = plainToClass(RefreshTokenDto, req.body);
+      const refreshToken = req.body.refreshToken;
 
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      if (!refreshToken) {
+        res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'Refresh token is required'
         });
         return;
       }
-
+      
+      const dto = { refreshToken: refreshToken };
       const result = await this.refreshTokenUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: 'Token refreshed successfully',

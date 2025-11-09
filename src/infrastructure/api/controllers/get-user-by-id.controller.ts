@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GetUserByIdUseCase } from '../../../application/use-cases/get-user-by-id.use-case';
-import { GetUserDto } from '../../../application/dtos/get-user.dto';
 
 export class GetUserByIdController {
   constructor(private readonly getUserByIdUseCase: GetUserByIdUseCase) {}
@@ -17,7 +16,7 @@ export class GetUserByIdController {
         return;
       }
 
-      const dto = new GetUserDto(userId);
+      const dto = { userId: userId };
       const user = await this.getUserByIdUseCase.execute(dto);
 
       res.status(200).json({

@@ -1,16 +1,15 @@
-import { RegisterUserDto } from '../dtos/register-user.dto';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { IPasswordHasher } from '../../domain/interfaces/password-hasher.interface';
 import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
 import { User, UserStatus } from '../../domain/entities/user.entity';
 import { UserValidator } from '../../domain/validators/user.validator';
 import { PasswordStrengthValidator } from '../../domain/validators/password-strength.validator';
-import { IRoleRepository } from '../../domain/interfaces/role.repository.interface'; // Nuevo
-import { IUserSkillRepository } from '../../domain/interfaces/user-skill.repository.interface'; // Nuevo
-import { ISkillRepository } from '../../domain/interfaces/skill.repository.interface'; // Nuevo
-import { IUserAvailabilityRepository } from '../../domain/interfaces/user-availability.repository.interface'; // Nuevo
-import { UserSkill } from '../../domain/entities/user-skill.entity'; // Nuevo
-import { UserAvailability } from '../../domain/entities/user-availability.entity'; // Nuevo
+import { IRoleRepository } from '../../domain/interfaces/role.repository.interface';
+import { IUserSkillRepository } from '../../domain/interfaces/user-skill.repository.interface';
+import { ISkillRepository } from '../../domain/interfaces/skill.repository.interface';
+import { IUserAvailabilityRepository } from '../../domain/interfaces/user-availability.repository.interface';
+import { UserSkill } from '../../domain/entities/user-skill.entity';
+import { UserAvailability } from '../../domain/entities/user-availability.entity';
 
 export class RegisterUserUseCase {
   constructor(
@@ -23,7 +22,7 @@ export class RegisterUserUseCase {
     private readonly userAvailabilityRepository: IUserAvailabilityRepository
   ) {}
 
-  async execute(dto: RegisterUserDto): Promise<{
+  async execute(dto: any): Promise<{
     message: string;
     user: User;
   }> {
@@ -65,6 +64,7 @@ export class RegisterUserUseCase {
     await userValidator.validateWithCustomRules();
 
     const savedUser = await this.userRepository.save(newUser);
+
     const volunteerRole = await this.roleRepository.findByName('Voluntario');
     if (!volunteerRole) {
        throw {
@@ -89,9 +89,7 @@ export class RegisterUserUseCase {
     }
 
     if (dto.availabilitySlots && dto.availabilitySlots.length > 0) {
-      
       for (const slot of dto.availabilitySlots) {
-        
         const availability = new UserAvailability(
           0, savedUser.id, slot.dayOfWeek, slot.startTime, slot.endTime, new Date(), new Date()
         );

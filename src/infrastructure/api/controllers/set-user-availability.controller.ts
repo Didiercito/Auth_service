@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { SetUserAvailabilityUseCase } from '../../../application/use-cases/set-user-availability.use-case';
-import { SetAvailabilityDto, AvailabilitySlotDto } from '../../../application/dtos/set-availability.dto';
 
 export class SetUserAvailabilityController {
   constructor(private readonly setUserAvailabilityUseCase: SetUserAvailabilityUseCase) {}
@@ -8,6 +7,7 @@ export class SetUserAvailabilityController {
   handle = async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = req.user?.userId;
+      const availabilitySlots = req.body.availabilitySlots;
 
       if (!userId) {
         res.status(401).json({
@@ -17,13 +17,17 @@ export class SetUserAvailabilityController {
         return;
       }
 
-      const availabilitySlots = req.body.availabilitySlots.map((slot: any) => 
-        new AvailabilitySlotDto(slot.dayOfWeek, slot.startTime, slot.endTime)
-      );
-
-      const dto = new SetAvailabilityDto(userId, availabilitySlots);
+      if (!Array.isArray(availabilitySlots)) {
+         res.status(400).json({
+          success: false,
+          message: 'availabilitySlots must be an array'
+        });
+        return;
+      }
+      
+      const dto = { userId: userId, availabilitySlots: availabilitySlots };
       const availability = await this.setUserAvailabilityUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: 'Availability set successfully',

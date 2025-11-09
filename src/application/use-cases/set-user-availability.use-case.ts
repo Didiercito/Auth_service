@@ -1,4 +1,3 @@
-import { SetAvailabilityDto } from '../dtos/set-availability.dto';
 import { IUserAvailabilityRepository } from '../../domain/interfaces/user-availability.repository.interface';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { UserAvailability } from '../../domain/entities/user-availability.entity';
@@ -9,7 +8,11 @@ export class SetUserAvailabilityUseCase {
     private readonly userRepository: IUserRepository
   ) {}
 
-  async execute(dto: SetAvailabilityDto): Promise<UserAvailability[]> {
+  async execute(dto: any): Promise<UserAvailability[]> {
+    if (!dto.userId || !dto.availabilitySlots || !Array.isArray(dto.availabilitySlots)) {
+      throw new Error('User ID and valid availabilitySlots array are required');
+    }
+    
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
       throw new Error('User not found');
@@ -17,20 +20,17 @@ export class SetUserAvailabilityUseCase {
 
     for (let i = 0; i < dto.availabilitySlots.length; i++) {
       const slot = dto.availabilitySlots[i];
-      
       if (slot.startTime >= slot.endTime) {
         throw new Error(`Invalid time range for ${slot.dayOfWeek}: start time must be before end time`);
       }
 
       for (let j = i + 1; j < dto.availabilitySlots.length; j++) {
         const otherSlot = dto.availabilitySlots[j];
-        
         if (slot.dayOfWeek === otherSlot.dayOfWeek) {
           const slot1Start = this.timeToMinutes(slot.startTime);
           const slot1End = this.timeToMinutes(slot.endTime);
           const slot2Start = this.timeToMinutes(otherSlot.startTime);
           const slot2End = this.timeToMinutes(otherSlot.endTime);
-
           if (this.hasOverlap(slot1Start, slot1End, slot2Start, slot2End)) {
             throw new Error(`Time slots overlap on ${slot.dayOfWeek}`);
           }
@@ -39,7 +39,6 @@ export class SetUserAvailabilityUseCase {
     }
 
     await this.userAvailabilityRepository.deleteByUserId(dto.userId);
-
     const availabilities: UserAvailability[] = [];
 
     for (const slot of dto.availabilitySlots) {
@@ -52,7 +51,6 @@ export class SetUserAvailabilityUseCase {
         new Date(),
         new Date()
       );
-
       const created = await this.userAvailabilityRepository.create(availability);
       availabilities.push(created);
     }

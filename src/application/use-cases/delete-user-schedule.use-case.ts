@@ -1,4 +1,3 @@
-import { DeleteScheduleDto } from '../dtos/delete-schedule.dto';
 import { IUserScheduleRepository } from '../../domain/interfaces/user-schedule.repository.interface';
 
 export class DeleteUserScheduleUseCase {
@@ -6,7 +5,11 @@ export class DeleteUserScheduleUseCase {
     private readonly userScheduleRepository: IUserScheduleRepository
   ) {}
 
-  async execute(dto: DeleteScheduleDto): Promise<void> {
+  async execute(dto: any): Promise<void> {
+    if (!dto.scheduleId) {
+      throw new Error('Schedule ID is required');
+    }
+    
     const schedule = await this.userScheduleRepository.findById(dto.scheduleId);
     if (!schedule) {
       throw new Error('Schedule not found');

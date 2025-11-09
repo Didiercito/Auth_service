@@ -1,31 +1,25 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
 import { RemoveRoleUseCase } from '../../../application/use-cases/remove-role.use-case';
-import { RemoveRoleDto } from '../../../application/dtos/remove-role.dto';
 
 export class RemoveRoleController {
   constructor(private readonly removeRoleUseCase: RemoveRoleUseCase) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const [dto] = plainToClass(RemoveRoleDto, req.body);
+      const userId = parseInt(req.body.userId);
+      const roleId = parseInt(req.body.roleId);
 
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      if (isNaN(userId) || isNaN(roleId)) {
+        res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'User ID and Role ID must be valid numbers'
         });
         return;
       }
-
+      
+      const dto = { userId: userId, roleId: roleId };
       const result = await this.removeRoleUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: result.message

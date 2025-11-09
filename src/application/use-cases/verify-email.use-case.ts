@@ -1,7 +1,6 @@
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { IEmailVerificationRepository } from '../../domain/interfaces/email-verification.repository.interface';
 import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
-import { VerifyEmailDto } from '../dtos/verify-email.dto';
 import { EmailVerificationValidator } from '../../domain/validators/email-verification.validator';
 
 export class VerifyEmailUseCase {
@@ -11,7 +10,11 @@ export class VerifyEmailUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: VerifyEmailDto): Promise<{ message: string }> {
+  async execute(dto: any): Promise<{ message: string }> {
+    if (!dto.token) {
+      throw { http_status: 400, message: 'Token is required' };
+    }
+    
     const verification = await this.emailVerificationRepository.findByToken(dto.token);
     if (!verification) {
       throw {
@@ -53,7 +56,6 @@ export class VerifyEmailUseCase {
       email: user.email,
       timestamp: new Date().toISOString()
     });
-    
     return {
       message: 'Email verified successfully'
     };

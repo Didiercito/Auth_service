@@ -32,11 +32,11 @@ app.use('/api/v1/password', PasswordRoutes);
 app.use('/api/v1/permission', permissonRoutes);
 app.use('/api/v1/role', RoleRoutes);
 app.use('/api/v1/verification', VerificationRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/skills', skillRoutes);
-app.use('/api/availability', availabilityRoutes);
-app.use('/api/schedules', scheduleRoutes);
-app.use('/api/reputation', reputationRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/skills', skillRoutes);
+app.use('/api/v1/availability', availabilityRoutes);
+app.use('/api/v1/schedules', scheduleRoutes);
+app.use('/api/v1/reputation', reputationRoutes);
 
 
 export default app;

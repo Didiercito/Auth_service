@@ -1,4 +1,3 @@
-import { CheckAvailabilityDto } from '../dtos/check-availability.dto';
 import { IUserAvailabilityRepository } from '../../domain/interfaces/user-availability.repository.interface';
 import { IUserScheduleRepository } from '../../domain/interfaces/user-schedule.repository.interface';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
@@ -17,26 +16,32 @@ export class CheckUserAvailabilityUseCase {
     private readonly userRepository: IUserRepository
   ) {}
 
-  async execute(dto: CheckAvailabilityDto): Promise<AvailabilityCheckResult> {
+  async execute(dto: any): Promise<AvailabilityCheckResult> {
+    if (!dto.userId || !dto.startDateTime || !dto.endDateTime) {
+      throw new Error('User ID, startDateTime, and endDateTime are required');
+    }
+
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
       throw new Error('User not found');
     }
 
-    if (dto.startDateTime >= dto.endDateTime) {
+    const startDateTime = new Date(dto.startDateTime);
+    const endDateTime = new Date(dto.endDateTime);
+
+    if (startDateTime >= endDateTime) {
       return {
         isAvailable: false,
         reason: 'Invalid time range: start time must be before end time'
       };
     }
 
-    const dayOfWeek = this.getDayOfWeek(dto.startDateTime);
+    const dayOfWeek = this.getDayOfWeek(startDateTime);
 
     const availabilities = await this.userAvailabilityRepository.findByUserIdAndDay(
       dto.userId,
       dayOfWeek
     );
-
     if (availabilities.length === 0) {
       return {
         isAvailable: false,
@@ -44,9 +49,8 @@ export class CheckUserAvailabilityUseCase {
       };
     }
 
-    const requestedStartTime = this.getTimeString(dto.startDateTime);
-    const requestedEndTime = this.getTimeString(dto.endDateTime);
-
+    const requestedStartTime = this.getTimeString(startDateTime);
+    const requestedEndTime = this.getTimeString(endDateTime);
     const isWithinAvailability = availabilities.some(availability => {
       return this.isTimeInRange(
         requestedStartTime,
@@ -55,7 +59,6 @@ export class CheckUserAvailabilityUseCase {
         availability.endTime
       );
     });
-
     if (!isWithinAvailability) {
       return {
         isAvailable: false,
@@ -65,10 +68,9 @@ export class CheckUserAvailabilityUseCase {
 
     const conflictingSchedules = await this.userScheduleRepository.findConflicts(
       dto.userId,
-      dto.startDateTime,
-      dto.endDateTime
+      startDateTime,
+      endDateTime
     );
-
     if (conflictingSchedules.length > 0) {
       return {
         isAvailable: false,

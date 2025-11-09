@@ -2,7 +2,6 @@ import { IUserRepository } from '../../domain/interfaces/user.repository.interfa
 import { IPasswordHasher } from '../../domain/interfaces/password-hasher.interface';
 import { ITokenGenerator } from '../../domain/interfaces/token-generator.interface';
 import { IRoleRepository } from '../../domain/interfaces/role.repository.interface';
-import { LoginUserDto } from '../dtos/login-user.dto';
 import { UserStatus } from '../../domain/entities/user.entity';
 
 export interface LoginUserResponse {
@@ -28,9 +27,8 @@ export class LoginUserUseCase {
     private readonly tokenGenerator: ITokenGenerator
   ) {}
 
-  async execute(dto: LoginUserDto): Promise<LoginUserResponse> {
+  async execute(dto: any): Promise<LoginUserResponse> {
     const user = await this.userRepository.findByEmail(dto.email.toLowerCase());
-
     if (!user) {
       throw {
         http_status: 401,
@@ -42,7 +40,6 @@ export class LoginUserUseCase {
       dto.password,
       user.passwordHash
     );
-
     if (!isPasswordValid) {
       throw {
         http_status: 401,
@@ -66,7 +63,6 @@ export class LoginUserUseCase {
 
     const roles = await this.roleRepository.getUserRoles(user.id);
     const roleNames = roles.map(role => role.name);
-
     const accessToken = this.tokenGenerator.generateAccessToken(
       user.id,
       user.email,

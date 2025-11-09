@@ -1,4 +1,3 @@
-import { GetUserSchedulesDto } from '../dtos/get-user-schedules.dto';
 import { IUserScheduleRepository } from '../../domain/interfaces/user-schedule.repository.interface';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { UserSchedule } from '../../domain/entities/user-schedule.entity';
@@ -17,14 +16,22 @@ export class GetUserSchedulesUseCase {
     private readonly userRepository: IUserRepository
   ) {}
 
-  async execute(dto: GetUserSchedulesDto): Promise<PaginatedResult<UserSchedule>> {
+  async execute(dto: any): Promise<PaginatedResult<UserSchedule>> {
+    if (!dto.userId) {
+      throw new Error('User ID is required');
+    }
+
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
       throw new Error('User not found');
     }
 
-    const { page = 1, limit = 20, startDate, endDate, eventId } = dto;
-
+    const page = parseInt(dto.page) || 1;
+    const limit = parseInt(dto.limit) || 20;
+    const startDate = dto.startDate ? new Date(dto.startDate) : undefined;
+    const endDate = dto.endDate ? new Date(dto.endDate) : undefined;
+    const eventId = parseInt(dto.eventId) || undefined;
+    
     const result = await this.userScheduleRepository.findByUserIdPaginated({
       userId: dto.userId,
       page,
@@ -33,7 +40,6 @@ export class GetUserSchedulesUseCase {
       endDate,
       eventId
     });
-
     const totalPages = Math.ceil(result.total / limit);
 
     return {

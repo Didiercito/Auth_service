@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { RemoveUserSkillUseCase } from '../../../application/use-cases/remove-user-skill.use-case';
-import { RemoveSkillDto } from '../../../application/dtos/remove-skill.dto';
 
 export class RemoveUserSkillController {
   constructor(private readonly removeUserSkillUseCase: RemoveUserSkillUseCase) {}
@@ -26,9 +25,9 @@ export class RemoveUserSkillController {
         return;
       }
 
-      const dto = new RemoveSkillDto(userId, skillId);
+      const dto = { userId: userId, skillId: skillId };
       await this.removeUserSkillUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: 'Skill removed successfully'

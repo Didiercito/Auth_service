@@ -9,6 +9,13 @@ export class AssignVolunteerRoleUseCase {
   ) {}
 
   async execute(userId: number): Promise<void> {
+    if (!userId) {
+       throw {
+        http_status: 400,
+        message: 'User ID is required'
+      };
+    }
+
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw {

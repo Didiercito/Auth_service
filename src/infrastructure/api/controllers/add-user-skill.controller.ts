@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
 import { AddUserSkillUseCase } from '../../../application/use-cases/add-user-skill.use-case';
-import { AddSkillDto } from '../../../application/dtos/add-skill.dto';
 
 export class AddUserSkillController {
   constructor(private readonly addUserSkillUseCase: AddUserSkillUseCase) { }
@@ -9,7 +7,8 @@ export class AddUserSkillController {
   handle = async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = req.user?.userId;
-
+      const skillId = parseInt(req.body.skillId);
+      
       if (!userId) {
         res.status(401).json({
           success: false,
@@ -18,28 +17,23 @@ export class AddUserSkillController {
         return;
       }
 
-      const dto = new AddSkillDto(
-        userId,
-        req.body.skillId,
-        req.body.proficiencyLevel,
-        req.body.yearsOfExperience
-      );
-
-      const errors = await validate(dto);
-      if (errors.length > 0) {
-        res.status(422).json({
+      if (isNaN(skillId)) {
+        res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'Invalid or missing skillId'
         });
         return;
       }
+      
+      const dto = {
+        userId: userId,
+        skillId: skillId,
+        proficiencyLevel: req.body.proficiencyLevel ? parseInt(req.body.proficiencyLevel) : undefined,
+        yearsOfExperience: req.body.yearsOfExperience ? parseInt(req.body.yearsOfExperience) : undefined,
+      };
 
       const userSkill = await this.addUserSkillUseCase.execute(dto);
-
+      
       res.status(201).json({
         success: true,
         message: 'Skill added successfully',

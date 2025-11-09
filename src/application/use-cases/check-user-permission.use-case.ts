@@ -1,12 +1,5 @@
 import { IPermissionRepository } from '../../domain/interfaces/permission.repository.interface';
 
-export interface CheckUserPermissionDto {
-  userId: number;
-  module: string;
-  action: string;
-  resource: string;
-}
-
 export interface CheckUserPermissionResponse {
   hasPermission: boolean;
   userId: number;
@@ -18,14 +11,20 @@ export class CheckUserPermissionUseCase {
     private readonly permissionRepository: IPermissionRepository
   ) {}
 
-  async execute(dto: CheckUserPermissionDto): Promise<CheckUserPermissionResponse> {
+  async execute(dto: any): Promise<CheckUserPermissionResponse> {
+    if (!dto.userId || !dto.module || !dto.action || !dto.resource) {
+      throw {
+        http_status: 400,
+        message: 'User ID, module, action, and resource are required'
+      };
+    }
+    
     const hasPermission = await this.permissionRepository.userHasPermission(
       dto.userId,
       dto.module,
       dto.action,
       dto.resource
     );
-
     return {
       hasPermission,
       userId: dto.userId,

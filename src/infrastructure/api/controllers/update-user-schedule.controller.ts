@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { UpdateUserScheduleUseCase } from '../../../application/use-cases/update-user-schedule.use-case';
-import { UpdateScheduleDto } from '../../../application/dtos/update-schedule.dto';
 
 export class UpdateUserScheduleController {
   constructor(private readonly updateUserScheduleUseCase: UpdateUserScheduleUseCase) {}
@@ -8,6 +7,8 @@ export class UpdateUserScheduleController {
   handle = async (req: Request, res: Response): Promise<void> => {
     try {
       const scheduleId = parseInt(req.params.id);
+      let startDateTime: Date | undefined;
+      let endDateTime: Date | undefined;
 
       if (isNaN(scheduleId)) {
         res.status(400).json({
@@ -16,9 +17,6 @@ export class UpdateUserScheduleController {
         });
         return;
       }
-
-      let startDateTime: Date | undefined;
-      let endDateTime: Date | undefined;
 
       if (req.body.startDateTime) {
         startDateTime = new Date(req.body.startDateTime);
@@ -42,14 +40,14 @@ export class UpdateUserScheduleController {
         }
       }
 
-      const dto = new UpdateScheduleDto(
-        scheduleId,
-        startDateTime,
-        endDateTime,
-        req.body.notes,
-        req.body.eventId
-      );
-
+      const dto = {
+        scheduleId: scheduleId,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+        notes: req.body.notes,
+        eventId: req.body.eventId
+      };
+      
       const schedule = await this.updateUserScheduleUseCase.execute(dto);
 
       res.status(200).json({

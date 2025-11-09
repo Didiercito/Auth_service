@@ -2,7 +2,6 @@ import { IUserRepository } from '../../domain/interfaces/user.repository.interfa
 import { IPhoneVerificationRepository } from '../../domain/interfaces/phone-verification.repository.interface';
 import { ITokenGenerator } from '../../domain/interfaces/token-generator.interface';
 import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
-import { ResendPhoneVerificationDto } from '../dtos/resend-phone-verification.dto';
 import { PhoneVerification } from '../../domain/entities/phone-verification.entity';
 
 export class ResendPhoneVerificationUseCase {
@@ -13,9 +12,12 @@ export class ResendPhoneVerificationUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: ResendPhoneVerificationDto): Promise<{ message: string; code?: string }> {
+  async execute(dto: any): Promise<{ message: string; code?: string }> {
+    if (!dto.userId) {
+      throw { http_status: 400, message: 'User ID is required' };
+    }
+    
     const user = await this.userRepository.findById(dto.userId);
-
     if (!user) {
       throw {
         http_status: 404,
@@ -62,7 +64,6 @@ export class ResendPhoneVerificationUseCase {
       new Date(),
       null
     );
-
     await this.phoneVerificationRepository.save(phoneVerification);
 
     await this.eventPublisher.publish('user.phone.verification.resent', {
@@ -71,7 +72,6 @@ export class ResendPhoneVerificationUseCase {
       verificationCode,
       timestamp: new Date().toISOString()
     });
-
     const isDevelopment = process.env.NODE_ENV === 'development';
 
     return {

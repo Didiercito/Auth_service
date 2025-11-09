@@ -1,36 +1,21 @@
 import { Request, Response } from 'express';
-import { validate } from 'class-validator';
-import { plainToInstance } from 'class-transformer';
 import { RegisterUserUseCase } from '../../../application/use-cases/register-user.use-case';
-import { RegisterUserDto } from '../../../application/dtos/register-user.dto';
 
 export class RegisterUserController {
   constructor(private readonly registerUserUseCase: RegisterUserUseCase) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const transformedDto = plainToInstance(RegisterUserDto, req.body);
+      const dto = req.body;
       
-      if (Array.isArray(transformedDto)) {
-        throw new Error("Invalid input: Expected a single user object, received an array.");
-      }
-
-      const dto: RegisterUserDto = transformedDto;
-      
-      const errors = await validate(dto);
-      
-      if (errors.length > 0) {
-        res.status(422).json({
+      if (!dto.email || !dto.password || !dto.names || !dto.firstLastName || !dto.secondLastName || !dto.stateId || !dto.municipalityId) {
+         res.status(422).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
-            property: error.property,
-            constraints: error.constraints
-          }))
+          message: 'Validation failed: Missing required fields.'
         });
         return;
       }
-
+      
       const result = await this.registerUserUseCase.execute(dto);
       
       res.status(201).json({

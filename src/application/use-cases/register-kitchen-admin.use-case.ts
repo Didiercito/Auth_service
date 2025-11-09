@@ -5,7 +5,6 @@ import { IEventPublisher } from '../../domain/interfaces/event-publisher.interfa
 import { User, UserStatus } from '../../domain/entities/user.entity';
 import { UserValidator } from '../../domain/validators/user.validator';
 import { PasswordStrengthValidator } from '../../domain/validators/password-strength.validator';
-import { RegisterKitchenAdminDto } from '../dtos/register-kitchen-admin.dto';
 
 export class RegisterKitchenAdminUseCase {
   constructor(
@@ -15,7 +14,7 @@ export class RegisterKitchenAdminUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: RegisterKitchenAdminDto): Promise<{
+  async execute(dto: any): Promise<{
     success: boolean;
     message: string;
     userId: number;
@@ -23,6 +22,13 @@ export class RegisterKitchenAdminUseCase {
   }> {
     const { responsibleData, kitchenData, locationData } = dto;
 
+    if (!responsibleData || !kitchenData || !locationData) {
+      throw { http_status: 400, message: 'Missing required data sections (responsibleData, kitchenData, locationData)' };
+    }
+    if (!responsibleData.email || !responsibleData.password || !responsibleData.names) {
+      throw { http_status: 400, message: 'Missing essential responsible data (email, password, names)' };
+    }
+    
     const existingUser = await this.userRepository.findByEmail(responsibleData.email);
     if (existingUser) {
       throw {
@@ -35,7 +41,6 @@ export class RegisterKitchenAdminUseCase {
     await passwordValidator.validate();
 
     const hashedPassword = await this.passwordHasher.hash(responsibleData.password);
-
     const newUser = new User(
       0,
       responsibleData.names,
@@ -58,7 +63,6 @@ export class RegisterKitchenAdminUseCase {
       new Date(),
       null
     );
-
     const userValidator = new UserValidator(newUser);
     await userValidator.validateWithCustomRules();
 
@@ -82,7 +86,6 @@ export class RegisterKitchenAdminUseCase {
       secondLastName: savedUser.secondLastName,
       timestamp: new Date().toISOString()
     });
-
     await this.eventPublisher.publish('kitchen.admin.registered', {
       userId: savedUser.id,
       userData: {

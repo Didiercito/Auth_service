@@ -2,7 +2,6 @@ import { IUserRepository } from '../../domain/interfaces/user.repository.interfa
 import { IPasswordResetTokenRepository } from '../../domain/interfaces/password-reset-token.repository.interface';
 import { ITokenGenerator } from '../../domain/interfaces/token-generator.interface';
 import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
-import { RequestPasswordResetDto } from '../dtos/request-password-reset.dto';
 import { PasswordResetToken } from '../../domain/entities/password-reset-token.entity';
 
 export class RequestPasswordResetUseCase {
@@ -13,9 +12,12 @@ export class RequestPasswordResetUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: RequestPasswordResetDto): Promise<{ message: string }> {
+  async execute(dto: any): Promise<{ message: string }> {
+    if (!dto.email) {
+      throw { http_status: 400, message: 'Email is required' };
+    }
+    
     const user = await this.userRepository.findByEmail(dto.email.toLowerCase());
-
     if (!user) {
       return {
         message: 'If the email exists, a password reset link will be sent.'
@@ -34,7 +36,6 @@ export class RequestPasswordResetUseCase {
       new Date(),
       null
     );
-
     await this.passwordResetTokenRepository.save(passwordResetToken);
 
     await this.eventPublisher.publish('user.password.reset.requested', {
@@ -43,7 +44,6 @@ export class RequestPasswordResetUseCase {
       resetToken,
       timestamp: new Date().toISOString()
     });
-
     return {
       message: 'If the email exists, a password reset link will be sent.'
     };

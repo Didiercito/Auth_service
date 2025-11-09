@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GetUserReputationHistoryUseCase } from '../../../application/use-cases/get-user-reputation-history.use-case';
-import { GetReputationHistoryDto } from '../../../application/dtos/get-reputation-history.dto';
 
 export class GetUserReputationHistoryController {
   constructor(private readonly getUserReputationHistoryUseCase: GetUserReputationHistoryUseCase) {}
@@ -19,26 +18,18 @@ export class GetUserReputationHistoryController {
 
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
+      
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
 
-      let startDate: Date | undefined;
-      let endDate: Date | undefined;
-
-      if (req.query.startDate) {
-        startDate = new Date(req.query.startDate as string);
-      }
-
-      if (req.query.endDate) {
-        endDate = new Date(req.query.endDate as string);
-      }
-
-      const dto = new GetReputationHistoryDto(
-        userId,
-        startDate,
-        endDate,
-        page,
-        limit
-      );
-
+      const dto = {
+        userId: userId,
+        startDate: startDate,
+        endDate: endDate,
+        page: page,
+        limit: limit
+      };
+      
       const result = await this.getUserReputationHistoryUseCase.execute(dto);
 
       res.status(200).json({

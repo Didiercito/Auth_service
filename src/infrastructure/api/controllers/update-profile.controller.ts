@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { UpdateProfileUseCase } from '../../../application/use-cases/update-profile.use-case';
-import { UpdateProfileDto } from '../../../application/dtos/update-profile.dto';
 
 export class UpdateProfileController {
   constructor(private readonly updateProfileUseCase: UpdateProfileUseCase) {}
@@ -17,15 +16,8 @@ export class UpdateProfileController {
         return;
       }
 
-      const dto = new UpdateProfileDto(
-        req.body.names,
-        req.body.firstLastName,
-        req.body.secondLastName,
-        req.body.phoneNumber,
-        req.body.imageProfile,
-        req.body.stateId,
-        req.body.municipalityId
-      );
+      // Pasamos todo el body al caso de uso, dejando la validación de campos opcionales al CU
+      const dto = req.body; 
 
       const updatedUser = await this.updateProfileUseCase.execute(userId, dto);
 

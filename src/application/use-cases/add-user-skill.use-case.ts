@@ -1,4 +1,3 @@
-import { AddSkillDto } from '../dtos/add-skill.dto';
 import { IUserSkillRepository } from '../../domain/interfaces/user-skill.repository.interface';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { ISkillRepository } from '../../domain/interfaces/skill.repository.interface';
@@ -11,7 +10,11 @@ export class AddUserSkillUseCase {
     private readonly skillRepository: ISkillRepository
   ) {}
 
-  async execute(dto: AddSkillDto): Promise<UserSkill> {
+  async execute(dto: any): Promise<UserSkill> {
+    if (!dto.userId || !dto.skillId) {
+      throw new Error('User ID and Skill ID are required');
+    }
+
     const user = await this.userRepository.findById(dto.userId);
     if (!user) {
       throw new Error('User not found');
@@ -30,7 +33,6 @@ export class AddUserSkillUseCase {
       dto.userId,
       dto.skillId
     );
-
     if (existingUserSkill) {
       throw new Error('User already has this skill');
     }
@@ -44,7 +46,6 @@ export class AddUserSkillUseCase {
       new Date(),
       new Date()
     );
-
     return await this.userSkillRepository.create(userSkill);
   }
 }

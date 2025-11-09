@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GetUserSkillsUseCase } from '../../../application/use-cases/get-user-skills.use-case';
-import { GetUserSkillsDto } from '../../../application/dtos/get-user-skills.dto';
 
 export class GetUserSkillsController {
   constructor(private readonly getUserSkillsUseCase: GetUserSkillsUseCase) {}
@@ -17,7 +16,7 @@ export class GetUserSkillsController {
         return;
       }
 
-      const dto = new GetUserSkillsDto(userId);
+      const dto = { userId: userId };
       const skills = await this.getUserSkillsUseCase.execute(dto);
 
       res.status(200).json({

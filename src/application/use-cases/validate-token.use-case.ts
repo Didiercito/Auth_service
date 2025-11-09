@@ -1,6 +1,5 @@
 import { ITokenGenerator, TokenPayload } from '../../domain/interfaces/token-generator.interface';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface'
-import { ValidateTokenDto } from '../dtos/validate-token.dto';
 
 export interface ValidateTokenResponse {
   isValid: boolean;
@@ -17,10 +16,13 @@ export class ValidateTokenUseCase {
     private readonly userRepository: IUserRepository
   ) {}
 
-  async execute(dto: ValidateTokenDto): Promise<ValidateTokenResponse> {
+  async execute(dto: any): Promise<ValidateTokenResponse> {
+    if (!dto.token) {
+      return { isValid: false };
+    }
+    
     try {
       const payload: TokenPayload = this.tokenGenerator.verifyAccessToken(dto.token);
-
       const user = await this.userRepository.findById(payload.userId);
 
       if (!user) {
@@ -39,7 +41,6 @@ export class ValidateTokenUseCase {
           roles: payload.roles
         }
       };
-
     } catch (error) {
       return { isValid: false };
     }

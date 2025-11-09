@@ -1,13 +1,15 @@
-import { UpdateProfileDto } from '../dtos/update-profile.dto';
 import { IUserRepository } from '../../domain/interfaces/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 
 export class UpdateProfileUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async execute(userId: number, dto: UpdateProfileDto): Promise<User> {
+  async execute(userId: number, dto: any): Promise<User> {
+    if (!userId) {
+      throw new Error('Authentication User ID is required');
+    }
+    
     const user = await this.userRepository.findById(userId);
-
     if (!user) {
       throw new Error('User not found');
     }

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { UpdateUserUseCase } from '../../../application/use-cases/update-user.use-case';
-import { UpdateUserDto } from '../../../application/dtos/update-user.dto';
 
 export class UpdateUserController {
   constructor(private readonly updateUserUseCase: UpdateUserUseCase) {}
@@ -16,23 +15,23 @@ export class UpdateUserController {
         });
         return;
       }
-
-      const dto = new UpdateUserDto(
-        userId,
-        req.body.names,
-        req.body.firstLastName,
-        req.body.secondLastName,
-        req.body.email,
-        req.body.phoneNumber,
-        req.body.imageProfile,
-        req.body.status,
-        req.body.reputationScore,
-        req.body.stateId,
-        req.body.municipalityId
-      );
+      
+      const dto = {
+        userId: userId,
+        names: req.body.names,
+        firstLastName: req.body.firstLastName,
+        secondLastName: req.body.secondLastName,
+        email: req.body.email,
+        phoneNumber: req.body.phoneNumber,
+        imageProfile: req.body.imageProfile,
+        status: req.body.status,
+        reputationScore: req.body.reputationScore,
+        stateId: req.body.stateId,
+        municipalityId: req.body.municipalityId
+      };
 
       const updatedUser = await this.updateUserUseCase.execute(dto);
-
+      
       res.status(200).json({
         success: true,
         message: 'User updated successfully',

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { GetSkillsUseCase } from '../../../application/use-cases/get-skills.use-case';
-import { GetSkillsDto } from '../../../application/dtos/get-skills.dto';
 
 export class GetSkillsController {
   constructor(private readonly getSkillsUseCase: GetSkillsUseCase) {}
@@ -10,9 +9,19 @@ export class GetSkillsController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 50;
       const search = req.query.search as string;
-      const isActive = req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined;
-
-      const dto = new GetSkillsDto(page, limit, search, isActive);
+      
+      let isActive: boolean | undefined = undefined;
+      if (req.query.isActive !== undefined) {
+          isActive = req.query.isActive === 'true';
+      }
+      
+      const dto = {
+          page: page,
+          limit: limit,
+          search: search,
+          isActive: isActive
+      };
+      
       const result = await this.getSkillsUseCase.execute(dto);
 
       res.status(200).json({

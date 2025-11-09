@@ -2,7 +2,6 @@ import { IUserRepository } from '../../domain/interfaces/user.repository.interfa
 import { IEmailVerificationRepository } from '../../domain/interfaces/email-verification.repository.interface';
 import { ITokenGenerator } from '../../domain/interfaces/token-generator.interface';
 import { IEventPublisher } from '../../domain/interfaces/event-publisher.interface';
-import { ResendEmailVerificationDto } from '../dtos/resend-email-verification.dto';
 import { EmailVerification } from '../../domain/entities/email-verification.entity';
 
 export class ResendEmailVerificationUseCase {
@@ -13,9 +12,12 @@ export class ResendEmailVerificationUseCase {
     private readonly eventPublisher: IEventPublisher
   ) {}
 
-  async execute(dto: ResendEmailVerificationDto): Promise<{ message: string }> {
-    const user = await this.userRepository.findByEmail(dto.email.toLowerCase());
+  async execute(dto: any): Promise<{ message: string }> {
+    if (!dto.email) {
+       throw { http_status: 400, message: 'Email is required' };
+    }
 
+    const user = await this.userRepository.findByEmail(dto.email.toLowerCase());
     if (!user) {
       return {
         message: 'If the email exists, a verification link will be sent.'
@@ -43,7 +45,6 @@ export class ResendEmailVerificationUseCase {
       }
     }
 
-    // 4. Generar nuevo token
     const verificationToken = this.tokenGenerator.generateRandomToken();
     const emailVerification = new EmailVerification(
       0,
@@ -54,7 +55,6 @@ export class ResendEmailVerificationUseCase {
       new Date(),
       null
     );
-
     await this.emailVerificationRepository.save(emailVerification);
 
     await this.eventPublisher.publish('user.email.verification.resent', {
@@ -63,7 +63,6 @@ export class ResendEmailVerificationUseCase {
       verificationToken,
       timestamp: new Date().toISOString()
     });
-
     return {
       message: 'If the email exists, a verification link will be sent.'
     };
