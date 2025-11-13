@@ -28,36 +28,21 @@ export class SetUserAvailabilityUseCase {
 
     const updatedSlots: UserAvailability[] = [];
 
-    for (const existing of currentAvailabilities) {
-      const incoming = incomingMap.get(existing.dayOfWeek) as { startTime: string; endTime: string } | undefined;
-
-      if (!incoming) {
-        await this.userAvailabilityRepository.delete(existing.id);
-      } else {
-        if (
-          existing.startTime !== incoming.startTime ||
-          existing.endTime !== incoming.endTime
-        ) {
-          existing.startTime = incoming.startTime;
-          existing.endTime = incoming.endTime;
-          existing.updatedAt = new Date();
-
-          const updated = await this.userAvailabilityRepository.update(existing);
-          updatedSlots.push(updated);
-        } else {
-          updatedSlots.push(existing);
+    currentAvailabilities.forEach(existing => {
+        if (incomingMap.has(existing.dayOfWeek)) {
+            incomingMap.delete(existing.dayOfWeek); 
         }
-
-        incomingMap.delete(existing.dayOfWeek);
-      }
-    }
+        updatedSlots.push(existing); 
+    });
 
     for (const [dayOfWeek, slot] of incomingMap.entries()) {
+      
       const typedSlot = slot as { startTime: string; endTime: string };
+      
       const newAvailability = new UserAvailability(
         0,
         dto.userId,
-        DayOfWeek[dayOfWeek as keyof typeof DayOfWeek],
+        dayOfWeek as DayOfWeek, 
         typedSlot.startTime,
         typedSlot.endTime,
         new Date(),

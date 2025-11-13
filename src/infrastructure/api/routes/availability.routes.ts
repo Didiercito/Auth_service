@@ -4,14 +4,15 @@ import {
   getUserAvailabilityController,
   checkUserAvailabilityController,
   updateUserAvailabilityController,
-  deleteUserAvailabilityController
+  deleteUserAvailabilityController,
+  getMyAvailabilityController 
 } from '../dependencies/dependencies';
 import { AuthMiddleware } from '../../../middleware/auth.middleware'; 
 
 const router = Router();
 const authMiddleware = new AuthMiddleware();
 
-router.get('/me', authMiddleware.authenticate, getUserAvailabilityController.handle.bind(getUserAvailabilityController));
+router.get('/me', authMiddleware.authenticate, getMyAvailabilityController.handle.bind(getMyAvailabilityController));
 
 router.post('/me', authMiddleware.authenticate, setUserAvailabilityController.handle.bind(setUserAvailabilityController));
 

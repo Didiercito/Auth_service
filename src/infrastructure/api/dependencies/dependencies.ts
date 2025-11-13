@@ -1,6 +1,5 @@
 import { AppDataSource } from '../../../config/data-source';
 
-// === ADAPTERS ===
 import { UserAdapter } from '../../adapters/user.adapter';
 import { EmailVerificationRepository } from '../../adapters/email-verification.adapter';
 import { PhoneVerificationRepository } from '../../adapters/phone-verification.adapter';
@@ -13,12 +12,10 @@ import { UserAvailabilityAdapter } from '../../adapters/user-availability.adapte
 import { UserScheduleAdapter } from '../../adapters/user-schedule.adapter';
 import { UserReputationHistoryAdapter } from '../../adapters/user-reputation-history.adapter';
 
-// === SERVICES ===
 import { BcryptPasswordHasherService } from '../../../services/bcrypt-password-hasher.service';
 import { JwtTokenGeneratorService } from '../../../services/jwt-token-generator.service';
 import { RabbitMQEventPublisherService } from '../../../services/rabbitmq-event-publisher.service';
 
-// === USE CASES ===
 import { 
   RegisterUserUseCase,
   LoginUserUseCase,
@@ -59,7 +56,6 @@ import {
 import { UpdateUserAvailabilityUseCase } from '../../../application/use-cases/update-user-availability.use-case';
 import { GetMyProfileUseCase } from '../../../application/use-cases/get-my-profile.use-case';
 
-// === CONTROLLERS ===
 import {
   RegisterUserController,
   LoginUserController,
@@ -94,7 +90,8 @@ import {
   UpdateUserReputationController,
   GetUserReputationHistoryController,
   CompleteProfileController,
-  RegisterKitchenAdminController
+  RegisterKitchenAdminController,
+  GetMyAvailabilityController
 } from '../controllers';
 import { UpdateUserAvailabilityController } from '../controllers/update-user-availability.controller';
 import { DeleteUserAvailabilityController } from '../controllers/delete-user-availability.controller';
@@ -219,5 +216,6 @@ export const updateUserReputationController = new UpdateUserReputationController
 export const getUserReputationHistoryController = new GetUserReputationHistoryController(getUserReputationHistoryUseCase);
 export const completeProfileController = new CompleteProfileController(completeProfileUseCase);
 export const getMyProfileController = new GetMyProfileController(getMyProfileUseCase);
+export const getMyAvailabilityController = new GetMyAvailabilityController(getUserAvailabilityUseCase); // <--- Agregar
 
 export { tokenGenerator, eventPublisher };

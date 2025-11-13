@@ -6,23 +6,24 @@ export class SetUserAvailabilityController {
 
   async handle(req: Request, res: Response): Promise<Response> {
     try {
-      const userId = (req as any).user?.id;
+      const userId = req.user?.userId; 
+      
       if (!userId) {
-        return res.status(401).json({ message: 'Token inválido o no proporcionado' });
+        return res.status(401).json({ message: 'Token inválido o no proporcionado' }); 
       }
 
       const { availabilitySlots } = req.body;
-
+      
       if (!Array.isArray(availabilitySlots)) {
         return res.status(400).json({
-          message: 'El campo "availabilitySlots" debe ser un arreglo de objetos válidos',
+          message: 'El campo "availabilitySlots" debe ser un arreglo de objetos válidos', 
         });
       }
 
       for (const slot of availabilitySlots) {
         if (!slot.dayOfWeek || !slot.startTime || !slot.endTime) {
           return res.status(400).json({
-            message: 'Cada slot debe tener dayOfWeek, startTime y endTime',
+            message: 'Cada slot debe tener dayOfWeek, startTime y endTime', 
           });
         }
       }
@@ -30,9 +31,10 @@ export class SetUserAvailabilityController {
       const result = await this.setUserAvailabilityUseCase.execute({
         userId,
         availabilitySlots,
-      });
-
-      return res.status(200).json(result);
+      }); 
+      
+      return res.status(200).json(result); 
+      
     } catch (error: any) {
       console.error('❌ Error en SetUserAvailabilityController:', error);
       return res.status(500).json({

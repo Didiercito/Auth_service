@@ -32,3 +32,4 @@ export * from './update-user-reputation.controller';
 export * from './get-user-reputation-history.controller';
 export * from './complete-profile.controller';
 export * from './register-kitchen-admin.controller';
+export * from './get-my-availability.controller'
