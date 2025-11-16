@@ -6,37 +6,35 @@ export class LoginUserController {
 
   async handle(req: Request, res: Response): Promise<void> {
     try {
-      const dto = req.body;
-      
-      if (!dto.email || !dto.password) {
-         res.status(422).json({
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        res.status(422).json({
           success: false,
           message: 'Validation failed',
-          errors: [{ property: 'email', constraints: { isNotEmpty: 'Email is required' } },
-                   { property: 'password', constraints: { isNotEmpty: 'Password is required' } }]
+          errors: {
+            email: !email ? 'Email is required' : undefined,
+            password: !password ? 'Password is required' : undefined
+          }
         });
         return;
       }
 
-      const result = await this.loginUserUseCase.execute(dto);
+      const result = await this.loginUserUseCase.execute({ email, password });
+
       res.status(200).json({
         success: true,
         message: 'Login successful',
         data: result
       });
+
     } catch (error: any) {
-      if (error.http_status) {
-        res.status(error.http_status).json({
-          success: false,
-          message: error.message || 'Login failed'
-        });
-      } else {
-        console.error('Login error:', error);
-        res.status(500).json({
-          success: false,
-          message: 'Internal server error'
-        });
-      }
+      console.error('Login error:', error);
+
+      res.status(error.http_status || 500).json({
+        success: false,
+        message: error.message || 'Internal server error'
+      });
     }
   }
 }

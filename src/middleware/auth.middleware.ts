@@ -8,6 +8,8 @@ declare global {
         userId: number;
         email: string;
         roles?: string[];
+        stateId: number | null;
+        municipalityId: number | null;
       };
     }
   }
@@ -32,27 +34,20 @@ export class AuthMiddleware {
         return;
       }
 
-      const token = authHeader.substring(7); 
-      
-      if (!token || token.trim() === '') {
-        res.status(401).json({
-          success: false,
-          message: 'Token inválido o no proporcionado'
-        });
-        return;
-      }
+      const token = authHeader.substring(7);
 
       const payload = this.tokenGenerator.verifyAccessToken(token);
 
       req.user = {
         userId: payload.userId,
         email: payload.email,
-        roles: payload.roles
+        roles: payload.roles,
+        stateId: payload.stateId,
+        municipalityId: payload.municipalityId
       };
 
       next();
     } catch (error: any) {
-      console.error('Error en autenticación:', error.message);
       res.status(401).json({
         success: false,
         message: 'Token inválido o expirado'
@@ -78,7 +73,7 @@ export class AuthMiddleware {
           success: false,
           message: 'Permisos insuficientes',
           requiredRoles: allowedRoles,
-          userRoles: userRoles
+          userRoles
         });
         return;
       }

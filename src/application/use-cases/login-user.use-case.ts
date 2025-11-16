@@ -13,6 +13,8 @@ export interface LoginUserResponse {
     status: UserStatus;
     verifiedEmail: boolean;
     verifiedPhone: boolean;
+    stateId: number | null;
+    municipalityId: number | null;
   };
   accessToken: string;
   refreshToken: string;
@@ -30,44 +32,36 @@ export class LoginUserUseCase {
   async execute(dto: any): Promise<LoginUserResponse> {
     const user = await this.userRepository.findByEmail(dto.email.toLowerCase());
     if (!user) {
-      throw {
-        http_status: 401,
-        message: 'Invalid credentials'
-      };
+      throw { http_status: 401, message: 'Invalid credentials' };
     }
 
-    const isPasswordValid = await this.passwordHasher.compare(
-      dto.password,
-      user.passwordHash
-    );
+    const isPasswordValid = await this.passwordHasher.compare(dto.password, user.passwordHash);
     if (!isPasswordValid) {
-      throw {
-        http_status: 401,
-        message: 'Invalid credentials'
-      };
+      throw { http_status: 401, message: 'Invalid credentials' };
     }
 
     if (user.status === UserStatus.SUSPENDED) {
-      throw {
-        http_status: 403,
-        message: 'Account suspended. Please contact support.'
-      };
+      throw { http_status: 403, message: 'Account suspended. Please contact support.' };
     }
 
     if (user.status === UserStatus.INACTIVE) {
-      throw {
-        http_status: 403,
-        message: 'Account inactive. Please contact support.'
-      };
+      throw { http_status: 403, message: 'Account inactive. Please contact support.' };
     }
 
     const roles = await this.roleRepository.getUserRoles(user.id);
-    const roleNames = roles.map(role => role.name);
+    const roleNames = roles.map((role) => role.name);
+
+    const stateId = user.stateId ?? null;
+    const municipalityId = user.municipalityId ?? null;
+
     const accessToken = this.tokenGenerator.generateAccessToken(
       user.id,
       user.email,
-      roleNames
+      roleNames,
+      stateId,
+      municipalityId
     );
+
     const refreshToken = this.tokenGenerator.generateRefreshToken(user.id);
 
     return {
@@ -78,7 +72,9 @@ export class LoginUserUseCase {
         fullName: `${user.names} ${user.firstLastName} ${user.secondLastName}`,
         status: user.status,
         verifiedEmail: user.verifiedEmail,
-        verifiedPhone: user.verifiedPhone
+        verifiedPhone: user.verifiedPhone,
+        stateId,
+        municipalityId
       },
       accessToken,
       refreshToken,

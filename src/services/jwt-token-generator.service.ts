@@ -19,11 +19,20 @@ export class JwtTokenGeneratorService implements ITokenGenerator {
     this.refreshTokenExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
   }
 
-  generateAccessToken(userId: number, email: string, roles?: string[]): string {
+  generateAccessToken(
+    userId: number,
+    email: string,
+    roles: string[] = [],
+    stateId: number | null = null,
+    municipalityId: number | null = null
+  ): string {
+    
     const payload: TokenPayload = {
       userId,
       email,
-      ...(roles && { roles })
+      roles,
+      stateId,
+      municipalityId
     };
 
     const options: SignOptions = {
@@ -36,9 +45,7 @@ export class JwtTokenGeneratorService implements ITokenGenerator {
   }
 
   generateRefreshToken(userId: number): string {
-    const payload: RefreshTokenPayload = {
-      userId
-    };
+    const payload: RefreshTokenPayload = { userId };
 
     const options: SignOptions = {
       expiresIn: this.refreshTokenExpiresIn as any,
