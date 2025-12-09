@@ -44,6 +44,8 @@ export const rabbitmqConfig = {
     kitchenAdminUserSynced:
       process.env.RABBITMQ_ROUTINGKEY_KITCHEN_ADMIN_USER_SYNCED ||
       'kitchen.admin.userId.synced',
+
+      userDeleted: process.env.RABBITMQ_ROUTINGKEY_USER_DELETED || 'user.deleted',
   },
 
   options: {

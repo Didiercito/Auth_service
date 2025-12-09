@@ -34,7 +34,7 @@ export class PhoneVerificationSchema {
   @Column({ type: 'timestamp', nullable: true, name: 'used_at' })
   usedAt!: Date | null;
 
-  @ManyToOne(() => UserSchema)
+  @ManyToOne(() => UserSchema, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: UserSchema;
 }

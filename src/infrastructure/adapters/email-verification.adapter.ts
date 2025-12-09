@@ -72,6 +72,10 @@ export class EmailVerificationRepository implements IEmailVerificationRepository
       .execute();
   }
 
+  async deleteByUserId(userId: number): Promise<void> {
+    await this.repository.delete({ userId });
+  }
+
   private toDomain(schema: EmailVerificationSchema): EmailVerification {
     return new EmailVerification(
       schema.id,

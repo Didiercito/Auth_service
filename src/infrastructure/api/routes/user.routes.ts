@@ -6,7 +6,8 @@ import {
   updateProfileController,
   deleteUserController,
   completeProfileController,
-  getMyProfileController
+  getMyProfileController,
+  deleteMyAccountController
 } from '../dependencies/dependencies';
 import { AuthMiddleware } from '../../../middleware/auth.middleware'; 
 
@@ -17,6 +18,8 @@ const router = Router();
 router.get('/', getUsersPaginatedController.handle.bind(getUsersPaginatedController));
 
 router.get('/profile', authMiddleware.authenticate, getMyProfileController.handle.bind(getMyProfileController)); 
+
+router.delete('/me', authMiddleware.authenticate, deleteMyAccountController.handle.bind(deleteMyAccountController));
 
 router.get('/:id', authMiddleware.authenticate, getUserByIdController.handle.bind(getUserByIdController));
 

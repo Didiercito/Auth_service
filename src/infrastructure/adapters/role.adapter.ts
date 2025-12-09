@@ -100,6 +100,11 @@ export class RoleRepository implements IRoleRepository {
     );
   }
 
+  // 👇 MÉTODO AGREGADO PARA ELIMINAR CUENTA
+  async removeAllRolesFromUser(userId: number): Promise<void> {
+    await this.userRoleRepository.delete({ userId });
+  }
+
   private toDomain(schema: RoleSchema): Role {
     return new Role(
       schema.id,

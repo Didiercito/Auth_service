@@ -55,7 +55,8 @@ import {
   GetUserReputationHistoryUseCase,
   AssignVolunteerRoleUseCase,
   CompleteProfileUseCase,
-  RegisterAdminKitchenUseCase
+  RegisterAdminKitchenUseCase,
+  DeleteMyAccountUseCase,
 } from '../../../application/use-cases';
 
 import { UpdateUserAvailabilityUseCase } from '../../../application/use-cases/update-user-availability.use-case';
@@ -103,6 +104,7 @@ import {
 import { UpdateUserAvailabilityController } from '../controllers/update-user-availability.controller';
 import { DeleteUserAvailabilityController } from '../controllers/delete-user-availability.controller';
 import { GetMyProfileController } from '../controllers/get-my-profile.controller';
+import { DeleteMyAccountController } from '../controllers/delete-my-account.controller';
 
 const userRepository = new UserAdapter(AppDataSource);
 const emailVerificationRepository = new EmailVerificationRepository();
@@ -306,6 +308,13 @@ const getMyProfileUseCase = new GetMyProfileUseCase(
   userAvailabilityRepository
 );
 
+const deleteMyAccountUseCase = new DeleteMyAccountUseCase(
+  userRepository,
+  eventPublisher,
+  roleRepository,
+  emailVerificationRepository
+);
+
 export const registerUserController = new RegisterUserController(
   registerUserUseCase
 );
@@ -448,3 +457,7 @@ export const getMyAvailabilityController = new GetMyAvailabilityController(
 export const googleLoginController = new GoogleLoginController(googleLoginUseCase);
 
 export { tokenGenerator, eventPublisher, registerKitchenAdminUseCase };
+
+export const deleteMyAccountController = new DeleteMyAccountController(
+  deleteMyAccountUseCase
+);

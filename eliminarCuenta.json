@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "description": "Eliminar mi cuenta permanentemente (y datos relacionados)",
+      "method": "DELETE",
+      "url": "http://localhost:4006/api/v1/users/me",
+      "requiresToken": true,
+      "role": "Cualquier rol autenticado",
+      "req": null,
+      "res": {
+        "success": true,
+        "message": "Account and all related data deleted successfully."
+      }
+    }
+  ]
+}

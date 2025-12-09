@@ -9,4 +9,5 @@ export interface IEmailVerificationRepository {
   update(id: number, emailVerification: Partial<EmailVerification>): Promise<EmailVerification>;
   delete(id: number): Promise<void>;
   deleteExpired(): Promise<void>;
+  deleteByUserId(userId: number): Promise<void>;
 }

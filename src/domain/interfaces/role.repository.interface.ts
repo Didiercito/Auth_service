@@ -12,4 +12,5 @@ export interface IRoleRepository {
   removeRoleFromUser(userId: number, roleId: number): Promise<void>;
   getUserRoles(userId: number): Promise<Role[]>;
   setPrimaryRole(userId: number, roleId: number): Promise<void>;
+  removeAllRolesFromUser(userId: number): Promise<void>;
 }

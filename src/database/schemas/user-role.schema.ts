@@ -29,7 +29,7 @@ export class UserRoleSchema {
   @Column({ type: 'int', nullable: true, name: 'assigned_by' })
   assignedBy!: number | null;
 
-  @ManyToOne(() => UserSchema, user => user.userRoles)
+  @ManyToOne(() => UserSchema, user => user.userRoles, {onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: UserSchema;
 

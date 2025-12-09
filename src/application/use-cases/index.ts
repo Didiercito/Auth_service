@@ -35,3 +35,4 @@ export * from './assign-volunteer-role.use-case';
 export * from './complete-profile.use-case';
 export * from './register-admin-kitchen.use-case';
 export * from './get-user-by-email.use-case'
+export * from './delete-my-account.use-case';
